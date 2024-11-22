@@ -1,72 +1,57 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstdio>
+#include <algorithm>
+#include <vector>
+#include <cstring>
 using namespace std;
-int n, m, k, ch[500001][3], tot = 1, bo[500001], sum[500001], x;
-bool p[500001];
-/// ch[u][i]表示节点u的i字符指针指向的节点，若值为0，表示没有这个节点
-inline int read()
-{
-    int data = 0, w = 1;
-    char ch = 0;
-    while (ch != '-' && (ch < '0' || ch > '9'))
-        ch = getchar();
-    if (ch == '-')
-        w = -1, ch = getchar();
-    while (ch >= '0' && ch <= '9')
-        data = data * 10 + ch - '0', ch = getchar();
-    return data * w;
-} /// 快读
-
-void add(bool a[])
-{ // 插入字符串
-    int u = 1;
-    for (int i = 1; i <= k; i++)
-    {
-        int c = a[i];
-        if (ch[u][c] == -1)
-            ch[u][c] = ++tot;
-        u = ch[u][c]; /// 它指向它的子节点
-        sum[u]++;     /// 经过该节点字符串个数
-    }
-    bo[u]++; /// 该字符串以u结尾
-}
-
-int find(bool a[])
-{
-    int u = 1;
-    int res = 0;
-    for (int i = 1; i <= k; i++)
-    {
-        int c = a[i];
-        if (ch[u][c] == -1)
-            return res;
-        u = ch[u][c];
-        res += bo[u]; /// 加上与当前节点为结束的个数
-    }
-    return res - bo[u] + sum[u]; // 加上前缀相同且长度比它长的字符串个数
-}
-
+const int maxn = 5005;
+vector<pair<int, int>> side[maxn];
+int n, m, vis[maxn];
+long long dis[maxn], ans;
 int main()
 {
-    int x;
-    m = read();
-    n = read();
-    memset(ch, -1, sizeof ch); // 因为输入为0或1，所以初始值为-1
+    ios::sync_with_stdio(0);
+    cin >> n >> m;
     for (int i = 1; i <= m; i++)
     {
-        k = read();
-        for (int j = 1; j <= k; j++)
-        {
-            p[i] = read();
-        }
-        add(p);
+        int u, v, w;
+        cin >> u >> v >> w;
+        side[u].push_back(make_pair(v, w));
+        side[v].push_back(make_pair(u, w));
     }
-    for (int i = 1; i <= n; i++)
+    memset(dis, 0x3f, sizeof(dis));
+    int s = 1;
+    dis[s] = 0; // dis[i]代表一个未加入联通块的点到联通块的最近距离
+    for (int i = 0; i <= n; i++)
+        dis[i] = 1e18;
+    while (1)
     {
-        k = read();
-        for (int j = 1; j <= k; j++)
+        int now = 0;
+        for (int i = 1; i <= n; i++)
+            if (!vis[i] && dis[i] < dis[now])
+                now = i; // 取一个dis最小的（显然这个点满足通过一条边就能到达联通块，且这条边最小）
+        if (!now)
+            break;       // 所有点都走过 退出
+        ans += dis[now]; // 代表走连接联通块和now之间的边，累计答案
+        vis[now] = 1;    // 标记这个点 代表这个点并入联通块
+        for (int i = 0; i < side[now].size(); i++)
         {
-            p[j] = read();
+            int v = side[now][i].first, w = side[now][i].second;
+            if (!vis[v])
+                dis[v] = min(dis[v], 1ll * w); // 更新不在联通块内的点的dis
         }
-        printf("%d\n", find(p));
     }
+    cout << ans;
 }
+int now = 0;
+for (int i = 1; i <= n; i++)
+    if (!vis[i] && dis[i] < dis[now])
+        now = i; // 取一个dis最小的
+vis[now] = 1;
+if (now == 0)
+    break;
+for (int i = 1; i <= n; i++)
+    if (!vis[i])
+    {
+        dis[i] = min(dis[i], get_dis(now, i));
+    }

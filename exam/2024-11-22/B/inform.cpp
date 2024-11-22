@@ -1,65 +1,68 @@
 #include<bits/extc++.h>
-#define ri register
-#define int long long
+#define inf 0x7f7f7f7f
 #define pii pair<int,int>
+// #define pow(x,k) (x * x)
 using namespace std;
-const int maxn = 1000 + 5;
-int n,v,idx;
-int fa[maxn];
+const int maxn = 5000 + 5;
+int n,v,ans;
+int g[maxn][maxn],dis[maxn];
+bool vis[maxn];
 pii p[maxn];
-struct edge
-{
-    int u,v,w;
-    edge(int u = 0,int v = 0,int w = 0):u(u),v(v),w(w){};
-    bool operator<(edge x){return w < x.w;}
-}e[maxn * maxn];
 inline void read(int &x)
 {
     x = 0;
-    ri int f = 1;
-    ri char ch = getchar();
+    int f = 1;
+    char ch = getchar();
     while (ch < '0' || ch > '9'){f = ch == '-' ? -1 : 1; ch = getchar();}
     while (ch >= '0' && ch <= '9'){x = x * 10 + ch - '0'; ch = getchar();}
     x *= f;
 }
-inline void init()
+void prim(int st)
 {
-    for (ri int i = 0; i <= n; i++)    
-        fa[i] = i;
-}
-int find(int x)
-{
-    if (fa[x] == x)
-        return x;
-    return fa[x] = find(fa[x]);
+    memset(dis,0x7f,sizeof dis);
+    memset(vis,0,sizeof vis);
+    for (int i = 1; i <= n; i++)
+        dis[i] = v;
+    vis[0] = 1;
+    dis[st] = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        int u = 0,_min = inf;
+        for (int j = 0; j <= n; j++)
+        {
+            // cout << (dis[j] == inf ? -1 : dis[j]) << " ";
+            if (dis[j] < _min && !vis[j])
+            {
+                u = j;
+                _min = dis[j];
+            }
+        }
+        ans += _min;
+        vis[u] = 1;
+        for (int v = 0; v <= n; v++)
+            if (!vis[v] && dis[v] > g[u][v])
+                dis[v] = g[u][v];
+    }
 }
 signed main()
 {
     read(n),read(v);
-    init();
-    for (ri int i = 1; i <= n; i++)
+    memset(g,0x7f,sizeof dis);
+    for (int i = 1; i <= n; i++)
+    {
         read(p[i].first),read(p[i].second);
-    for (ri int i = 1; i <= n; i++)
-        for (ri int j = 1; j < i; j++)
+        g[i][i] = 0;
+    }
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j < i; j++)
         {
             int w = pow(p[i].first - p[j].first,2) + pow(p[i].second - p[j].second,2);
-            if (w > v)
-                continue;
-            e[++idx] = edge(i,j,w);
-        }
-    for (ri int i = 1; i <= n; i++)
-        e[++idx] = edge(0,i,v);
-    sort(e + 1,e + idx + 1);
-    ri int ans = 0;
-    for (ri int i = 1; i <= idx; i++)
-    {
-        int fu = find(e[i].u),fv = find(e[i].v);
-        if (fu != fv)
-        {
-            ans += e[i].w;
-            fa[fu] = fv;
+            g[i][j] = g[j][i] = w;
         }
     }
-    printf("%lld",ans);
+    ans = 0;
+    prim(0);
+    cout << ans;
     return 0;
 }
