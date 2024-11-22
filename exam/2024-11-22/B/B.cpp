@@ -1,9 +1,9 @@
 #include<bits/extc++.h>
-#define int long long
 #define ri register
+#define int long long
 #define pii pair<int,int>
 using namespace std;
-const int maxn = 5005;
+const int maxn = 1000 + 5;
 int n,v,idx;
 int fa[maxn];
 pii p[maxn];
