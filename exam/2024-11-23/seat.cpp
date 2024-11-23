@@ -55,3 +55,12 @@ signed main()
     cout << ans;
     return 0;
 }
+=======
+#include<bits/extc++.h>
+using namespace std;
+signed main()
+{
+	
+	return 0;
+}
+>>>>>>> gitee/main
