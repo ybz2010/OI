@@ -1,48 +1,47 @@
-#include <bits/stdc++.h>
+#include<bits/extc++.h>
 #define int long long
 using namespace std;
-int read()
+int q,x;
+const int maxn = 2e5 + 5;
+int tr[maxn][70],id = 1,siz[maxn * 70];
+void insert(int x)
 {
-    int x = 0;
-    int ff = 1;
-    char c = getchar();
-    while (c < '0' || c > '9')
+    int p = 1;
+    for (int i = 63; i >= 0; i--)
     {
-        if (c == '-')
-            ff = -1;
-        c = getchar();
+        int ch = (x >> i) & 1;
+        if (!tr[p][ch])
+            tr[p][ch] = ++id;
+        p = tr[p][ch];
+        siz[p] ++;
     }
-    while (c >= '0' && c <= '9')
-    {
-        x = x * 10 + c - '0';
-        c = getchar();
-    }
-    return x * ff;
 }
-const int N = 1e5 + 6;
-const int inf = LONG_LONG_MAX;
-int n, E, t, x[N], dp[N], k = 1e10, l = 1, r = 1, q[N];
+int find(int x)
+{
+    int ret = 0,p = 1;
+    for (int i = 63; i >= 0; i--)
+    {
+        int ch = (x >> i) & 1;
+        if (ch)
+            ret += siz[tr[p][0]];
+        if (!tr[p][ch])
+        {
+            if (!ch)
+                return 0;
+            break;
+        }
+        p = tr[p][ch];
+    }
+    return ret;
+}
 signed main()
 {
-    memset(dp, 0x7f, sizeof(dp));
-    n = read();
-    E = read();
-    t = read();
-    for (int i = 1; i <= n; i++)
-        x[i] = read();
-    dp[0] = 0;
-    for (int i = 1; i <= n; i++)
+    scanf("%lld",&q);
+    for (int i = 1; i <= q; i++)
     {
-        while (l <= r && 2 * (x[i] - x[q[l] + 1]) > t)
-        {
-            k = min(k, dp[q[l]] - 2 * x[q[l] + 1]);
-            l++;
-        }
-        dp[i] = min(dp[i], dp[q[l]] + t);
-        dp[i] = min(dp[i], k + 2 * x[i]);
-        cout << dp[i] << " ";
-        q[++r] = i;
+        scanf("%lld",&x);
+        cout << find(x) << endl << endl;
+        insert(x);
     }
-    printf("%lld\n", dp[n] + E);
     return 0;
 }
