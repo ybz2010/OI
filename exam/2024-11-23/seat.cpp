@@ -31,6 +31,8 @@ void init()
 }
 signed main()
 {
+    freopen("seat.in","r",stdin);
+    freopen("seat.out","w",stdout);
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
