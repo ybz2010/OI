@@ -1,66 +1,62 @@
-#include <bits/extc++.h>
+#include<bits/extc++.h>
 #define ll long long
+#define mod 998244353
 using namespace std;
 const int maxn = 2e6 + 5;
-const int mod = 998244353;
-int randseed;
-ll n, m, q;
-ll x[maxn],y[maxn],pos[maxn],ans[maxn];
-ll t[maxn],u[maxn],v[maxn],id[maxn];
+int randseed,n,m,q;
+int stu[maxn],idx,fw[maxn];
+int ex[maxn],ey[maxn],eu[maxn],ev[maxn];
+int x[maxn],y[maxn],t[maxn],u[maxn],v[maxn],id[maxn];
+struct node{
+	int t,u,v,id,idx;
+	bool operator<(node x){return t < x.t;}
+}a[maxn];
 unsigned int rnd()
 {
-    unsigned int r;
-    r = randseed = randseed * 1103515245 + 12345;
-    return (r << 16) | ((r >> 16) & 0xFFFF);
+	unsigned int r;
+	r = randseed = randseed * 1103515245 + 12345;
+	return (r << 16) | ((r >> 16) & 0xFFFF);
 }
 void init()
 {
-    cin >> n >> m >> q >> randseed;
-    for (int i = 1; i <= m; i++)
-    {
-        x[i] = rnd() % n + 1;
-        y[i] = rnd() % n + 1;
-    }
-    for (int i = 1; i <= q; i++)
-    {
-        t[i] = rnd() % m + 1;
-        u[i] = rnd() % n + 1;
-        v[i] = rnd() % n + 1;
-        id[i] = rnd() % n + 1;
-    }
+	cin>>n>>m>>q>>randseed;
+	for (int i=1;i<=m;i++) {x[i]=rnd()%n+1; y[i]=rnd()%n+1;}
+	for (int i=1;i<=q;i++) {a[i].t=rnd()%m+1; a[i].u=rnd()%n+1; a[i].v=rnd()%n+1;a[i].id=rnd()%n+1;a[i].idx = i;}
 }
 signed main()
 {
-    freopen("seat.in","r",stdin);
-    freopen("seat.out","w",stdout);
-    ios::sync_with_stdio(0);
-    cin.tie(0);
-    cout.tie(0);
-    init();
-    ll ans = 0;
-    for (int i = 1; i <= q; i++)
-    {
-        for (int j = 1; j <= n; j++)
-            pos[j] = j;
-        for (int j = 1; j <= m; j++)
-        {
-            if (j == t[i])
-                swap(pos[u[i]],pos[v[i]]);
-            else
-                swap(pos[x[j]],pos[y[j]]);
-        }
-        ll tmp = pos[id[i]];
-        ans = (ans + tmp * i % mod) % mod;
-    }
-    cout << ans;
-    return 0;
-}
-=======
-#include<bits/extc++.h>
-using namespace std;
-signed main()
-{
-	
+	init();
+	for (int i = 1; i <= n; i++)
+		stu[i] = i;
+	idx = 1;
+	sort(a + 1,a + q + 1);
+	for (int i = 1; i <= m; i++)
+	{
+		ex[i] = stu[x[i]];
+		ey[i] = stu[y[i]];
+		swap(stu[x[i]],stu[y[i]]);
+		while (idx <= q && a[idx].t == i)
+		{
+			a[idx].u = stu[a[idx].u];
+			a[idx].v = stu[a[idx].v];
+			idx ++;
+		}
+	}
+	for (int i = 1; i <= n; i++)
+		fw[stu[i]] = i;
+	ll ans = 0;
+	for (int i = 1; i <= q; i++)
+	{
+		if (ex[a[i].t] == a[i].id)
+			a[i].id = ey[a[i].t];
+		if (ey[a[i].t] == a[i].id)
+			a[i].id = ex[a[i].t];
+		if (a[i].v == a[i].id)
+			a[i].id = a[i].u;
+		if (a[i].u == a[i].id)
+			a[i].id = a[i].v;
+		ans = (ans + a[i].idx * fw[a[i].id] % mod) % mod;
+	}
+	cout << ans;
 	return 0;
 }
->>>>>>> gitee/main
