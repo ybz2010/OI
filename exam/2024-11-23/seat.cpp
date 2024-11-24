@@ -49,13 +49,13 @@ signed main()
 	{
 		if (ex[a[i].t] == a[i].id)
 			a[i].id = ey[a[i].t];
-		if (ey[a[i].t] == a[i].id)
+		else if (ey[a[i].t] == a[i].id)
 			a[i].id = ex[a[i].t];
 		if (a[i].v == a[i].id)
 			a[i].id = a[i].u;
-		if (a[i].u == a[i].id)
+		else if (a[i].u == a[i].id)
 			a[i].id = a[i].v;
-		ans = (ans + a[i].idx * fw[a[i].id] % mod) % mod;
+		ans = (ans + (ll)a[i].idx * fw[a[i].id] % mod) % mod;
 	}
 	cout << ans;
 	return 0;
