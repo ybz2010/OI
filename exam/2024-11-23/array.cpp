@@ -5,7 +5,6 @@ using namespace std;
 const int maxn = 2e7 + 10;
 int q, x, y, cnt = 1;
 int ls[maxn], rs[maxn], val[maxn];
-int getr(int c) { return c << 1 | 1; }
 int w(int y, int x)
 {
     if (x == 0 && y == 0)
