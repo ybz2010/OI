@@ -14,12 +14,6 @@ inline int read()
     while (ch >= '0' && ch <= '9'){x = x * 10 + ch - '0'; ch = getchar();}
     return x * f;
 }
-void write(int x)
-{
-    if(x > 9) write(x / 10);
-    if(x < 0) x = -x,putchar('-');
-    putchar(x % 10 + '0');
-}
 inline void push_up(int rt)
 {
     tree[rt].val = tree[tree[rt].ls].val + tree[tree[rt].rs].val;
@@ -69,7 +63,7 @@ signed main()
             upd(l,r,1,1,n,rt);
         else
             upd(l,r,0,1,n,rt);
-        write(n - tree[rt].val);
+        printf("%d",n - tree[rt].val);
         putchar('\n');
     }
     return 0;
