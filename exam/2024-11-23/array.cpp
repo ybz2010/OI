@@ -1,11 +1,10 @@
 #include<bits/extc++.h>
 #define int long long
+#define inf 1e18 + 114514
+#define maxn (int)2e7 + 5
 using namespace std;
-using namespace __gnu_pbds;
-const int maxn = 2e5 + 5;
-int q,x,y;
-int tr[maxn * 70][2],id = 1,siz[maxn * 70];
-gp_hash_table<int,int>apr;
+int q,x,y,cnt;
+int ls[maxn],rs[maxn],val[maxn];
 int getr(int c){return c << 1 | 1;}
 int getnum(int x,int y)
 {
@@ -21,49 +20,30 @@ int getnum(int x,int y)
     else 
         return st + r * 3 + y + c;
 }
-void insert(int x)
+int que(int rt,int l,int r,int x)
 {
-    int p = 1;
-    for (int i = 63; i >= 0; i--)
-    {
-        int ch = (x >> i) & 1;
-        if (!tr[p][ch])
-            tr[p][ch] = ++id;
-        p = tr[p][ch];
-        siz[p] ++;
-    }
-}
-int find(int x)
-{
-    int ret = 0,p = 1;
-    for (int i = 63; i >= 0; i--)
-    {
-        int ch = (x >> i) & 1;
-        if (ch)
-            ret += siz[tr[p][0]];
-        if (!tr[p][ch])
-        {
-            if (!ch)
-                return 0;
-            break;
-        }
-        p = tr[p][ch];
-    }
-    return ret;
+    val[rt] --;
+    if (l == r)
+        return x;
+    int mid = l + r >> 1;
+    if (!ls[rt])
+        ls[rt] = ++cnt,val[ls[rt]] = mid - l + 1;
+    if (!rs[rt])
+        rs[rt] = ++cnt,val[rs[rt]] = r - mid;
+    if (val[ls[rt]] >= x)
+        return que(ls[rt],l,mid,x);
+    else
+        return mid - l + 1 + que(rs[rt],mid + 1,r,x - val[ls[rt]]);    
 }
 signed main()
 {
-    freopen("array.in","r",stdin);
-    freopen("array.out","w",stdout);
     scanf("%lld",&q);
-    for (int i = 1; i <= q; i++)
+    val[1] = inf;
+    while (q--)
     {
         scanf("%lld%lld",&x,&y);
-        int pos = getnum(x,y);
-        int cnt = find(pos) + apr[pos];
-        cout << pos + cnt << endl;
-        apr[pos]++;
-        insert(pos);
+        int num = getnum(x,y);
+        printf("%lld\n",que(1,1,inf,num));
     }
     return 0;
 }
