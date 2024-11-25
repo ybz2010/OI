@@ -7,8 +7,7 @@ int n,m;
 int u[maxm],v[maxm];
 int head[maxn],idx = 1;
 int dfn[maxn],low[maxn],tim;
-int sc,bel[maxn],siz[maxn],out[maxn];
-int fa[maxn];
+int sc,siz[maxn],out[maxn];
 bool vis[maxn];
 stack<int>st;
 struct edge
@@ -16,23 +15,6 @@ struct edge
     int v,nxt;
     edge(int v = 0,int nxt = 0):v(v),nxt(nxt){};
 }e[maxm * 2];
-void init()
-{
-    for (int i = 1; i <= n; i++)
-        fa[i] = i;
-}
-int find(int x)
-{
-    if (fa[x] == x)
-        return x;
-    return fa[x] = find(fa[x]);
-}
-void un(int x,int y)
-{
-    int fx = find(x),fy = find(y);
-    if (fx != fy)
-        fa[fx] = fy;
-}
 void adde(int u,int v)
 {
     e[++idx] = edge(v,head[u]);
@@ -59,12 +41,10 @@ void tarjan(int u)
         sc ++;
         while (st.top() != u)
         {
-            bel[st.top()] = sc;
             siz[sc] ++;
             vis[st.top()] = 0;
             st.pop();
         }
-        bel[u] = sc;
         siz[sc] ++;
         vis[u] = 0;
         st.pop();
@@ -73,32 +53,20 @@ void tarjan(int u)
 signed main()
 {
     scanf("%lld%lld",&n,&m);
-    init();
     for (int i = 1; i <= m; i++)
     {
         scanf("%lld%lld",u + i,v + i);
         if (u[i] == v[i])
             continue;
-        un(u[i],v[i]);
         adde(u[i],v[i]);
     }
-    int f1 = find(1);
-    for (int i = 2; i <= n; i++)
-        if (f1 != find(i))
-        {
-            puts("0");
-            exit(0);
-        }
     for (int i = 1; i <= n; i++)
         if (!dfn[i])
             tarjan(i);
-    for (int i = 1; i <= m; i++)
-        if (bel[u[i]] != bel[v[i]])
-            out[bel[u[i]]] ++;
     int ans = 0;
     for (int i = 1; i <= sc; i++)
-        if (out[i] == 0)
-            ans += siz[i];
+        if (siz[i] > 1)
+            ans ++;
     cout << ans;
     return 0;
 }
