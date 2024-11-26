@@ -1,104 +1,29 @@
 #include<bits/extc++.h>
-#define int long long
 using namespace std;
-const int maxn = 1e4 + 5;
-const int maxm = 5e5 + 5;
-int n,m;
-int u[maxm],v[maxm];
-int head[maxn],idx = 1;
-int dfn[maxn],low[maxn],tim;
-int sc,bel[maxn],siz[maxn],out[maxn];
-int fa[maxn];
-bool vis[maxn];
-stack<int>st;
-struct edge
+const int maxn = 1e6 + 5;
+int n;
+bool ipr[maxn];
+vector<int>pr;
+void prime()
 {
-    int v,nxt;
-    edge(int v = 0,int nxt = 0):v(v),nxt(nxt){};
-}e[maxm * 2];
-void init()
-{
-    for (int i = 1; i <= n; i++)
-        fa[i] = i;
-}
-int find(int x)
-{
-    if (fa[x] == x)
-        return x;
-    return fa[x] = find(fa[x]);
-}
-void un(int x,int y)
-{
-    int fx = find(x),fy = find(y);
-    if (fx != fy)
-        fa[fx] = fy;
-}
-void adde(int u,int v)
-{
-    e[++idx] = edge(v,head[u]);
-    head[u] = idx;
-}
-void tarjan(int u)
-{
-    dfn[u] = low[u] = ++tim;
-    vis[u] = 1;
-    st.push(u);
-    for (int i = head[u]; i; i = e[i].nxt)
+    for (int i = 2; i <= n; i++)
     {
-        int v = e[i].v;
-        if (!dfn[v])
+        if (!ipr[i])
+            pr.push_back(i);
+        for (auto j : pr)
         {
-            tarjan(v);
-            low[u] = min(low[u],low[v]);
+            if (j * i > n)
+                break;
+            ipr[j * i] = 1;
+            if (i % j == 0)
+                break;
         }
-        else if (vis[v])
-            low[u] = min(low[u],dfn[v]);
-    }
-    if (low[u] == dfn[u])
-    {
-        sc ++;
-        while (st.top() != u)
-        {
-            bel[st.top()] = sc;
-            siz[sc] ++;
-            vis[st.top()] = 0;
-            st.pop();
-        }
-        bel[u] = sc;
-        siz[sc] ++;
-        vis[u] = 0;
-        st.pop();
     }
 }
 signed main()
 {
-    scanf("%lld%lld",&n,&m);
-    init();
-    for (int i = 1; i <= m; i++)
-    {
-        scanf("%lld%lld",u + i,v + i);
-        if (u[i] == v[i])
-            continue;
-        un(u[i],v[i]);
-        adde(u[i],v[i]);
-    }
-    int f1 = find(1);
-    for (int i = 2; i <= n; i++)
-        if (f1 != find(i))
-        {
-            puts("0");
-            exit(0);
-        }
-    for (int i = 1; i <= n; i++)
-        if (!dfn[i])
-            tarjan(i);
-    for (int i = 1; i <= m; i++)
-        if (bel[u[i]] != bel[v[i]])
-            out[bel[u[i]]] ++;
-    int ans = 0;
-    for (int i = 1; i <= sc; i++)
-        if (out[i] == 0)
-            ans += siz[i];
-    cout << ans;
+    scanf("%lld",&n);
+    prime();
+    cout << pr.size();
     return 0;
 }
