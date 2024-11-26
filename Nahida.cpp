@@ -2,36 +2,8 @@
 typedef long long ll;
 using namespace std;
 const int N = 1e6 + 5;
-int n, k, h[N], g[N][21], lg[N];
+int n, k, h[N], g[21], pos[21], idx;
 ll sum[N], ans;
-inline int gcd(int l, int r)
-{
-    int k = lg[r - l + 1];
-    return __gcd(g[l][k], g[r - (1 << k) + 1][k]);
-}
-inline ll solve(int r)
-{
-    int l = 1;
-    ll res = 0;
-    while (l <= r - k + 1)
-    {
-        const int glr = gcd(l, r);
-        res = max(res, glr * (sum[r] - sum[l - 1]));
-        if (glr == h[r])
-            break;
-        int L = l + 1, R = r, pos = r;
-        while (L <= R)
-        {
-            int mid = (L + R) >> 1;
-            if (gcd(mid, r) > glr)
-                pos = mid, R = mid - 1;
-            else
-                L = mid + 1;
-        }
-        l = pos;
-    }
-    return res;
-}
 signed main()
 {
     cin.tie(nullptr)->sync_with_stdio(false);
@@ -40,15 +12,21 @@ signed main()
         cin >> h[i];
     for (int i = 1; i <= n; i++)
         sum[i] = sum[i - 1] + h[i];
-    for (int i = 2; i <= n; i++)
-        lg[i] = lg[i >> 1] + 1;
     for (int i = 1; i <= n; i++)
-        g[i][0] = h[i];
-    for (int j = 1; j <= lg[n]; j++)
-        for (int i = 1; i + (1 << j) - 1 <= n; i++)
-            g[i][j] = __gcd(g[i][j - 1], g[i + (1 << (j - 1))][j - 1]);
-    for (int i = k; i <= n; i++)
-        ans = max(ans, solve(i));
+    {
+        for (int j = 1; j <= idx; j++)
+            g[j] = __gcd(g[j], h[i]);
+        if (g[idx] != h[i])
+            g[++idx] = h[i], pos[idx] = i;
+        int idx1 = 0;
+        for (int j = 1; j <= idx; j++)
+            if (g[j] != g[j - 1])
+                g[++idx1] = g[j], pos[idx1] = pos[j];
+        idx = idx1;
+        for (int j = 1; j <= idx; j++)
+            if (i - pos[j] + 1 >= k)
+                ans = max(ans, g[j] * (sum[i] - sum[pos[j] - 1]));
+    }
     cout << ans << endl;
     return 0;
 }

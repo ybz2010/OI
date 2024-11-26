@@ -3,7 +3,7 @@
 using namespace std;
 const int maxn = 1e6 + 5;
 int n,k;
-int a[maxn];
+int h[maxn];
 int tr[maxn * 25][2],siz[maxn * 25],id = 1;
 void insert(int x)
 {
@@ -43,8 +43,8 @@ signed main()
     scanf("%lld%lld",&n,&k);
     for (int i = 1; i <= n; i++)
     {
-        scanf("%lld",a + i);
-        insert(a[i]);
+        scanf("%lld",h + i);
+        insert(h[i]);
     }
     int ans = 0;
     for (int i = 0; i < 1 << 21; i++)
