@@ -86,42 +86,42 @@ signed main()
         l[i] = lca(c[i],d[i]);
     }
     int ans = binpow(k,n - 1),g,sum;
-    int a,b,s,t;
+    int tmp1,tmp2,st,en;
     for (int i = 1; i < (1 << m); i++)
     {
         g = 1,sum = 0;
         init();
         for (int j = 0; j < m; j++)
         {
-            if (i >> j & 1)
+            if (i & (1 << j))
             {
                 g = -g;
-                s = c[j + 1];
-                while (s != l[j + 1])
+                st = c[j + 1];
+                while (st != l[j + 1])
                 {
-                    if (f[s][0] == l[j + 1])
+                    if (f[st][0] == l[j + 1])
                         break;
-                    a = find(s),b = find(f[s][0]);
-                    if (a != b)
-                        fa[a] = b;
-                    s = f[s][0]; 
+                    tmp1 = find(st),tmp2 = find(f[st][0]);
+                    if (tmp1 != tmp2)
+                        fa[tmp1] = tmp2;
+                    st = f[st][0]; 
                 }
-                t = d[j + 1];
-                while (t != l[j + 1])
+                en = d[j + 1];
+                while (en != l[j + 1])
                 {
-                    if (f[t][0] == l[j + 1])
+                    if (f[en][0] == l[j + 1])
                         break;
-                    a = find(t),b = find(f[t][0]);
-                    if (a != b)
-                        fa[a] = b;
-                    t = f[t][0];
+                    tmp1 = find(en),tmp2 = find(f[en][0]);
+                    if (tmp1 != tmp2)
+                        fa[tmp1] = tmp2;
+                    en = f[en][0];
                 }
-                if (s != l[j + 1] && t != l[j + 1])
+                if (st != l[j + 1] && en != l[j + 1])
                 {
-                    a = find(s);
-                    b = find(t);
-                    if (a != b)
-                        fa[a] = b;
+                    tmp1 = find(st);
+                    tmp2 = find(en);
+                    if (tmp1 != tmp2)
+                        fa[tmp1] = tmp2;
                 }
             }
         }
