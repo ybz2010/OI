@@ -51,14 +51,16 @@ void dij(int st)
 }
 signed main()
 {
-    scanf("%lld",&n);
+    int sub;
+    scanf("%lld%lld",&sub,&n);
     for (int i = 1; i <= n; i++)
     {
-        for (int j = i; j <= n; j++)
+        for (int j = i + 1; j <= n; j++)
         {
             scanf("%lld",&a[i][j]);
+            a[j][i] = a[i][j];
             if (a[i][j] == -1)
-                a[i][j] = inf;
+                a[i][j] = a[j][i] = inf;
         }
     }
     for(int i = 1;i <= n;i ++) a[i][i] = 0;
@@ -74,7 +76,7 @@ signed main()
             for (int k = 1; k <= n; k++)
                 if (j != i && k != i && find(j) != find(k))
                     ans = min(ans,dis[j] + dis[k] + a[j][k]);
-        printf("%lld\n",ans >= inf ? -1ll : ans);
+        printf("%lld ",ans >= inf ? -1ll : ans);
     }
     return 0;
 }
