@@ -51,19 +51,21 @@ void dfs1(int u,int id)
             dfs1(v,id);
     }
 }
-void dfs2(int u,int st,int sum)
+void dfs2(int u,int st,int fa,int sum)
 {
     vis[u] = 1;
     for (int i = head[u]; i; i = e[i].nxt)
     {
         int v = e[i].v;
+        if (v == fa)
+            continue;
         if (v == st)
         {
             sum += e[i].w;
             ans = min(ans,sum);
         }
         else if (!vis[v])
-            dfs2(v,st,sum + e[i].w);
+            dfs2(v,st,u,sum + e[i].w);
     }
     vis[u] = 0;
 }
@@ -124,7 +126,7 @@ signed main()
         {
             memset(vis,0,sizeof vis);
             ans = INT_MAX;
-            dfs2(i,i,0);
+            dfs2(i,i,-1,0);
             printf("%lld ",ans == INT_MAX ? -1 : ans);
         }
     }
