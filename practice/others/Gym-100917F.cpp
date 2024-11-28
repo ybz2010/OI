@@ -54,7 +54,7 @@ signed main()
     scanf("%lld",&n);
     for (int i = 1; i <= n; i++)
     {
-        for (int j = i; j <= n; j++)
+        for (int j = 1; j <= n; j++)
         {
             scanf("%lld",&a[i][j]);
             if (a[i][j] == -1)
