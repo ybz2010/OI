@@ -1,77 +1,52 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
-
-template <typename T>
-void read(T &x)
+#define ll long long
+int pot1[5010][5010], pot0[5010][5010];
+int n, m, cnt;
+// pot1[i][j]代表第m-i次决策的r后面大于0的数字j 的个数
+// pot1[i][j]代表第m-i次决策的r后面小于0的数字，绝对值j 的个数
+ll dp[5010][5010];
+int main()
 {
-	int res = 0, f = 1;
-	char ch = getchar();
-	while (ch < '0' || ch > '9')
+	stack<ll> st;
+	scanf("%d%d", &n, &m);
+	for (int i = 1; i <= n; ++i)
 	{
-		if (ch == '-')
-			f = -1;
-		ch = getchar();
+		ll l;
+		scanf("%lld", &l);
+		st.push(l);
 	}
-	while (ch >= '0' && ch <= '9')
+	while (!st.empty())
 	{
-		res = (res << 3) + (res << 1) + (ch - '0');
-		ch = getchar();
+		int l = st.top();
+		st.pop();
+
+		if (l == 0)
+		{
+			cnt++;
+			for (int i = 0; i <= m; ++i)
+			{
+				pot1[cnt][i] = pot1[cnt - 1][i];
+				pot0[cnt][i] = pot0[cnt - 1][i];
+			}
+		}
+		if (l < 0)
+			pot0[cnt][-l]++;
+		if (l > 0)
+			pot1[cnt][l]++;
 	}
-	x = res * f;
-}
-const int maxn = 1000010;
-int n, mid, a[maxn], b[maxn], tmp, ans;
-vector<int> v1, v2;
-void solve0()
-{
-	for (int i = 1; i <= n; i++)
-		if (a[i] > mid)
-			v1.push_back(i);
-	for (int i = 1; i <= n; i++)
-		if (b[i] <= mid)
-			v2.push_back(i);
-	for (int i = 0; i < (int)v1.size(); i++)
-		ans += abs(v1[i] - v2[i]);
-	printf("%lld", ans);
-}
-
-void solve1()
-{
-	for (int i = 1; i <= n; i++)
-		if (a[i] >= mid)
-			v1.push_back(i);
-	for (int i = 1; i <= n; i++)
-		if (b[i] <= mid)
-			v2.push_back(i);
-	for (int i = 0; i < (int)v1.size(); i++)
-		tmp += abs(v1[i] - v2[i]);
-	v1.clear(), v2.clear();
-	for (int i = 1; i <= n; i++)
-		if (a[i] > mid)
-			v1.push_back(i);
-	for (int i = 1; i <= n; i++)
-		if (b[i] < mid)
-			v2.push_back(i);
-	for (int i = 0; i < (int)v1.size(); i++)
-		ans += abs(v1[i] - v2[i]);
-	printf("%lld", min(tmp, ans));
-}
-
-signed main()
-{
-	// freopen ("pop.in", "r", stdin);
-	// freopen ("pop.out", "w", stdout);
-
-	read(n);
-	mid = (n + 1) / 2;
-	for (int i = 1; i <= n; i++)
-		read(a[i]);
-	for (int i = 1; i <= n; i++)
-		read(b[i]);
-	if (n & 1)
-		solve1();
-	else
-		solve0();
-	return 0;
+	for (int i = 1; i <= m; ++i)
+	{
+		for (int j = 0; j <= m; ++j)
+		{
+			if (j - 1 >= 0)
+				dp[j][i - j] = max(dp[j][i - j], dp[j - 1][i - j] + pot0[m - i][j]);
+			if (i - j - 1 >= 0)
+				dp[j][i - j] = max(dp[j][i - j], dp[j][i - j - 1] + pot1[m - i][i - j]);
+		}
+	}
+	ll mxn = 0;
+	for (int i = 0; i <= m; ++i)
+		mxn = max(mxn, dp[i][m - i]);
+	printf("%lld", mxn);
 }
