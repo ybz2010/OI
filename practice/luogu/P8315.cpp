@@ -30,7 +30,7 @@ int binpow(int x,int y)
     }
     return ret;
 }
-void dfs(int u,int fa)//lca预处理
+void dfs1(int u,int fa)//lca预处理
 {
     f[u][0] = fa;
     dep[u] = dep[fa] + 1;
@@ -41,7 +41,7 @@ void dfs(int u,int fa)//lca预处理
         int v = e[i].v;
         if (v == fa)
             continue;
-        dfs(v,u);
+        dfs1(v,u);
     }
 }
 int lca(int u,int v)
@@ -79,7 +79,7 @@ signed main()
         adde(u,v);
         adde(v,u);
     }
-    dfs(1,0);
+    dfs1(1,0);
     for (int i = 1; i <= m; i++)
     {
         scanf("%lld%lld",c + i,d + i);
