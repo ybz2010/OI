@@ -12,18 +12,14 @@ signed main()
     for (int i = 1; i <= n; i++)
     {
         int r;
-        scanf("%lld",&r);
+        scanf("%d",&r);
         st.push(r);
     }
     while (!st.empty())
     {
         int r = st.top();
         st.pop();
-        if (r < 0)
-            b1[idx][-r] ++;
-        else if (r > 0)
-            b2[idx][r] ++;
-        else
+        if (r == 0)
         {
             idx ++;
             for (int i = 0; i <= m; i++)
@@ -32,13 +28,15 @@ signed main()
                 b2[idx][i] = b2[idx - 1][i];
             }
         }
+        if (r < 0)
+            b1[idx][-r] ++;
+        if (r > 0)
+            b2[idx][r] ++;
     }
     for (int i = 1; i <= m; i++)
     {
         for (int j = 0; j <= m; j++)
         {
-            if (i - j < 0)
-                continue;
             if (j - 1 >= 0)
                 dp[j][i - j] = max(dp[j][i - j],dp[j - 1][i - j] + b1[m - i][j]);
             if (i - j - 1 >= 0)
@@ -46,7 +44,7 @@ signed main()
         }
     }
     ll _max = 0;
-    for (int i = 1; i <= m; i++)
+    for (int i = 0; i <= m; i++)
         _max = max(_max,dp[i][m - i]);
     cout << _max;
     return 0;

@@ -1,6 +1,6 @@
 #include<stdio.h>
 const int maxn = 3e5 + 5;
-int n,q,cnt,rt;
+int n,q,idx,rt;
 struct Nahida
 {
     int val,lazy,ls,rs;
@@ -24,9 +24,9 @@ inline void push_down(int rt,int l,int r)
     {
         int mid = l + r >> 1;
         if (!tree[rt].ls)
-            tree[rt].ls = ++cnt;
+            tree[rt].ls = ++idx;
         if (!tree[rt].rs)
-            tree[rt].rs = ++cnt;
+            tree[rt].rs = ++idx;
         tree[tree[rt].ls].lazy = tree[rt].lazy;
         tree[tree[rt].rs].lazy = tree[rt].lazy;
         tree[tree[rt].ls].val = tree[rt].lazy * (mid - l + 1);
@@ -37,7 +37,7 @@ inline void push_down(int rt,int l,int r)
 void upd(int ql,int qr,int x,int l,int r,int &rt)
 {
     if (!rt)
-        rt = ++cnt;
+        rt = ++idx;
     if (ql <= l && r <= qr)
     {
         tree[rt].val = x * (r - l + 1);

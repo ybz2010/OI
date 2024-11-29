@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
-int pot1[5010][5010], pot0[5010][5010];
-int n, m, cnt;
-// pot1[i][j]代表第m-i次决策的r后面大于0的数字j 的个数
-// pot1[i][j]代表第m-i次决策的r后面小于0的数字，绝对值j 的个数
+int b2[5010][5010], b1[5010][5010];
+int n, m, idx;
+// b2[i][j]代表第m-i次决策的r后面大于0的数字j 的个数
+// b2[i][j]代表第m-i次决策的r后面小于0的数字，绝对值j 的个数
 ll dp[5010][5010];
 int main()
 {
@@ -18,31 +18,30 @@ int main()
 	}
 	while (!st.empty())
 	{
-		int l = st.top();
+		int r = st.top();
 		st.pop();
-
-		if (l == 0)
+		if (r == 0)
 		{
-			cnt++;
+			idx++;
 			for (int i = 0; i <= m; ++i)
 			{
-				pot1[cnt][i] = pot1[cnt - 1][i];
-				pot0[cnt][i] = pot0[cnt - 1][i];
+				b2[idx][i] = b2[idx - 1][i];
+				b1[idx][i] = b1[idx - 1][i];
 			}
 		}
-		if (l < 0)
-			pot0[cnt][-l]++;
-		if (l > 0)
-			pot1[cnt][l]++;
+		if (r < 0)
+			b1[idx][-r]++;
+		if (r > 0)
+			b2[idx][r]++;
 	}
 	for (int i = 1; i <= m; ++i)
 	{
 		for (int j = 0; j <= m; ++j)
 		{
 			if (j - 1 >= 0)
-				dp[j][i - j] = max(dp[j][i - j], dp[j - 1][i - j] + pot0[m - i][j]);
+				dp[j][i - j] = max(dp[j][i - j], dp[j - 1][i - j] + b1[m - i][j]);
 			if (i - j - 1 >= 0)
-				dp[j][i - j] = max(dp[j][i - j], dp[j][i - j - 1] + pot1[m - i][i - j]);
+				dp[j][i - j] = max(dp[j][i - j], dp[j][i - j - 1] + b2[m - i][i - j]);
 		}
 	}
 	ll mxn = 0;
