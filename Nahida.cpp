@@ -1,6 +1,16 @@
-#include <bits/stdc++.h>
+#include<bits/extc++.h>
 using namespace std;
-int main(){
-	char s; int a, b, t; cin >> t;
-	while(t--) scanf("%x%s%x", &a, &s, &b), cout << bitset<13>(a) << ' ' << s << ' ' << bitset<13>(b) << " = " << (s^45?a+b:a-b) << '\n';
+signed main()
+{
+	vector<int>a = {1,1,4,0,5,1,0,4};
+	for (int i = 0; i < a.size();)
+	{
+		if (a[i] == 0)
+			a.erase(a.begin() + i);
+		else
+			i ++;
+	}
+	for (auto i : a)
+		cout << i << " ";
+	return 0;
 }
