@@ -1,38 +1,33 @@
 #include<bits/extc++.h>
+#define inf 0x7f7f7f7f7f7f
 #define ll long long
 using namespace std;
 const int maxn = 1e5 + 5;
-const int inf = 1e9 + 7;
 int n,k;
-vector<ll>a;
+ll a[maxn];
+bool check(ll x)
+{
+    ll ret = 0;
+    for (int i = 1; i <= n; i++)
+        ret += min(a[i],x);
+    return (ret / x >= k);
+}
 void solve()
 {
     scanf("%d%d",&n,&k);
-    a.resize(n);
-    for (int i = 0; i < n; i++)
-        scanf("%lld",&a[i]);
-    sort(a.begin(),a.end(),greater<int>());
-    ll ans = 0;
-    while (a.size() >= k)
+    for (int i = 1; i <= n; i++)
+        scanf("%lld",a + i);
+    ll l = 1,r = inf,mid,ans = -inf;
+    while (l <= r)
     {
-        int idx = 0;
-        ll _min = inf;
-        for (int i = 0; i < k; i++)
-            _min = min(_min,a[i]);
-        ans += _min;
-        for (int i = 0; i < k; i++)
-            a[i] -= _min;
-	    for (int i = 0; i < a.size();)
-	    {
-	    	if (a[i] == 0)
-	    		a.erase(a.begin() + i);
-	    	else
-	    		i ++;
-	    }
-        sort(a.begin(),a.end(),greater<int>());
-        for (auto i : a)
-            printf("%lld ",i);
-        putchar('\n');
+        mid = l + r >> 1;
+        if (check(mid))
+        {
+            ans = mid;
+            l = mid + 1;
+        }
+        else
+            r = mid - 1;
     }
     printf("%lld\n",ans);
 }
@@ -44,17 +39,3 @@ signed main()
         solve();
     return 0;
 }
-/*
-5
-5 3
-1 3 2 4 5
-5 4
-2 2 2 2 10000
-5 5
-2 3 4 5 6
-5 1
-2 3 4 5 6
-5 2
-3 3 4 4 10
-*/
-// 3 π ，+ 咯
