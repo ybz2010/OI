@@ -9,6 +9,7 @@
                 "-g",
                 "-O2",
                 "-std=c++17",
+                "-Wl,-stack=0x10000000",
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
