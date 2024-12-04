@@ -24,6 +24,7 @@
         "text_encoding": "cpp",
         "regex": "cpp",
         "valarray": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "bit": "cpp"
     }
 }
