@@ -3,7 +3,7 @@
 using namespace std;
 const int maxn = 5e5 + 5;
 int n,Q;
-int head[maxn],idx = 1;
+int head[maxn],idx = 0;
 int dep[maxn],dsu[maxn];
 struct query
 {
@@ -20,7 +20,7 @@ struct father
 {
     int u,tim,len;
     father(int u = 0,int tim = 0,int len = 0):u(u),tim(tim),len(len){};
-}f[maxn][25];
+}f[maxn][30];
 void adde(int u,int v,int w,int tim)
 {
     e[++idx] = edge(v,w,tim,head[u]);
@@ -28,7 +28,7 @@ void adde(int u,int v,int w,int tim)
 }
 void init()
 {
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i <= n; i++)
         dsu[i] = i;
 }
 int find(int u)
@@ -45,27 +45,22 @@ void un(int u,int v)
 }
 vector<int> input()
 {
-    char s[25];
     vector<int>ret;
-    gets(s + 1);
-    s[0] = ' ';
-    int len = strlen(s);
-    for (int i = 0; i < len; i++)
+    char c;
+    int x;
+    while(scanf("%lld%c",&x,&c))
     {
-        if (s[i] == ' ')
-            ret.push_back(0);
-        else
-            ret.back() = ret.back() * 10 + s[i] - '0';
+        ret.push_back(x);
+        if(c == '\n')
+            break;
     }
-    while (ret.back() == 0)
-        ret.pop_back();
     return ret;
 }
 void dfs(int u,int len,int t,int fa)
 {
     dep[u] = dep[fa] + 1;
     f[u][0] = father(fa,t,len);
-    for (int i = 1; i < 25; i++)
+    for (int i = 1; i < 20; i++)
     {
         f[u][i].u = f[f[u][i - 1].u][i - 1].u;
         f[u][i].tim = max(f[u][i - 1].tim,f[f[u][i - 1].u][i - 1].tim);
@@ -84,7 +79,7 @@ int lca(int u,int v,int tim)
     if (dep[u] < dep[v])
         swap(u,v);
     int ret = 0;
-    for (int i = 24; i >= 0; i--)
+    for (int i = 19; i >= 0; i--)
     {
         if (dep[u] - (1 << i) >= dep[v])
         {
@@ -96,16 +91,18 @@ int lca(int u,int v,int tim)
     }
     if (u == v)
         return ret;
-    for (int i = 24; i >= 0; i--)
+    for (int i = 19; i >= 0; i--)
     {
         if (f[u][i].u != f[v][i].u)
         {
-            if (f[u][i].tim > tim || f[v][i].tim > tim)
+            if (f[u][i].tim > tim || f[v][i].tim > tim) 
                 return -1;
             ret += f[u][i].len + f[v][i].len;
             u = f[u][i].u,v = f[v][i].u;
         }
     }
+    if (f[u][0].tim > tim || f[v][0].tim > tim)
+        return -1;
     ret += f[u][0].len + f[v][0].len;
     return ret;
 }
@@ -119,7 +116,7 @@ signed main()
         que = input();
         if (que.size() == 2)
             q.push_back(query(que[0],que[1],i));
-        else
+        else if(que[0] != que[1])
         {
             adde(que[0],que[1],que[2],i);
             adde(que[1],que[0],que[2],i);
@@ -132,7 +129,7 @@ signed main()
     for (auto i : q)
     {
         if (find(i.x) != find(i.y))
-            puts("-1");
+            printf("-1\n");
         else
             printf("%lld\n",lca(i.x,i.y,i.tim));
     }
