@@ -26,6 +26,11 @@
         "valarray": "cpp",
         "chrono": "cpp",
         "bit": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "iostream": "cpp",
+        "functional": "cpp",
+        "random": "cpp",
+        "type_traits": "cpp",
+        "bitset": "cpp"
     }
 }
