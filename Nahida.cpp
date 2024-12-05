@@ -1,47 +1,50 @@
-#include<bits/stdc++.h>
-
+#include <bits/stdc++.h>
 using namespace std;
-
-int n, m, mapp[105], cnt = 0, f[105][105][105];
-
-struct point 
-{
-    int s, num;
-}a[105];
-
+const double eps = 1e-8;
+int t, n, m, lines[20][20], lowunbit[1 << 20], dp[1 << 20]; // lowunbit就是题解中的x
+double x[20], y[20];
+void equation(double &x, double &y, double x1, double y1, double z1, double x2, double y2, double z2)
+{ // 解方程
+    y = (x1 * z2 - x2 * z1) / (x1 * y2 - x2 * y1);
+    x = (z1 - y1 * y) / x1;
+}
 int main()
 {
-    cin >> n >> m;
-    for(int i = 1; i <= n; i++)
-        for(int j = 1; j <= m; j++)
-        {
-            char c;
-            cin >> c;
-            mapp[i] = (mapp[i] << 1) + (c == 'P');
-        }
-    for(int i = 0; i < (1 << m); i++)
-    {
-        if((i & (i << 1)) || (i & (i << 2)) || (i & (i >> 1)) || (i & (i >> 2))) continue;
-        cnt++;
-        a[cnt].s = i;
-		a[cnt].num = __popcount(i);
-        if((i & mapp[1]) == i) f[1][0][cnt] = a[cnt].num;
+    for (int i = 0; i < (1 << 18); i++)
+    { // 预处理lowunbit
+        int j = 1;
+        for (; j <= 18 && (i & (1 << (j - 1))); j++);
+        lowunbit[i] = j;
     }
-    cout << cnt << endl; //这个是预处理后的个数
-    for(int i = 1; i <= cnt; i++)
-        for(int j = 1; j <= cnt; j++)
-            if(!(a[i].s & a[j].s) && (mapp[2] & a[j].s) == a[j].s) f[2][i][j] = f[1][0][i] + a[j].num;
-    for(int i = 3; i <= n; i++)
-        for(int j = 1; j <= cnt; j++)
-            if((mapp[i] & a[j].s) == a[j].s) 
-                for(int k = 1; k <= cnt; k++)
-                    if(!(a[j].s & a[k].s))
-                        for(int l = 1; l <= cnt; l++)
-                            if(!(a[k].s & a[l].s) && !(a[j].s & a[l].s))
-								f[i][k][j] = max(f[i][k][j], f[i - 1][l][k] + a[j].num);
-    int ans = 0;
-    for(int i = 1; i <= cnt; i++)
-        for(int j = 1; j <= cnt; j++) ans = max(ans, f[n][i][j]);
-    printf("%d\n", ans);
-    return 0;
+    scanf("%d", &t);
+    while (t--)
+    {
+        memset(lines, 0, sizeof(lines)); // 各种初始化
+        memset(dp, 0x3f, sizeof(dp));
+        dp[0] = 0;
+        scanf("%d%d", &n, &m);
+        for (int i = 1; i <= n; i++)
+            scanf("%lf%lf", x + i, y + i);
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= n; j++)
+            { // 处理所有抛物线
+                if (fabs(x[i] - x[j]) < eps)
+                    continue; // x坐标相同，不可能有解
+                double a, b;
+                equation(a, b, x[i] * x[i], x[i], y[i], x[j] * x[j], x[j], y[j]);
+                if (a > -eps)
+                    continue; // 解出a和b
+                for (int k = 1; k <= n; k++)
+                    if (fabs(a * x[k] * x[k] + b * x[k] - y[k]) < eps)
+                        lines[i][j] |= (1 << (k - 1));
+            }
+        for (int i = 0; i < (1 << n); i++)
+        {                                                                    // 重点！状压开始！
+            int j = lowunbit[i];                                 // 必须经过lowunbit这个点
+            dp[i | (1 << (j - 1))] = min(dp[i | (1 << (j - 1))], dp[i] + 1); // 单独转移
+            for (int k = 1; k <= n; k++)
+                dp[i | lines[j][k]] = min(dp[i | lines[j][k]], dp[i] + 1); // 所有经过lowunbit的抛物线
+        }
+        printf("%d\n", dp[(1 << n) - 1]); // 答案
+    }
 }

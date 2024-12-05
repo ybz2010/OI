@@ -25,6 +25,7 @@
         "regex": "cpp",
         "valarray": "cpp",
         "chrono": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "complex": "cpp"
     }
 }
