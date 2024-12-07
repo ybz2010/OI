@@ -1,120 +1,120 @@
 #include<bits/stdc++.h>
-// #define int long long
-
-#include<bits/extc++.h>
+#define int long long
+#define pii pair<int,int>
+#define mkp make_pair
 using namespace std;
-const int MAXN = 2e5 + 10;
-const int dx[] = {0,1,0,-1};
-const int dy[] = {1,0,-1,0};
-const int inf = 1e9;
-int n,m,q,x[MAXN],y[MAXN],r[MAXN];
-int mp[2000005],Answer;
-bool flag[MAXN];
-vector <int> vec;
+const int MAXN = 3e5 + 10;
+const int mod = 1e9 + 7;
+const int inf = 0x3f3f3f3f3f3f;
 
-inline void read(int &T)
+inline int read()
 {
-    T = 0;
-    int f = 1;
+    int f = 1,res = 0;
     char ch = getchar();
     while(!isdigit(ch)){if(ch == '-') f = -1;ch = getchar();}
-    while(isdigit(ch)){T = (T << 1) + (T << 3) + (ch ^ 48);ch = getchar();}
-    T *= f;
+    while(isdigit(ch)){res = (res << 1) + (res << 3) + (ch ^ 48);ch = getchar();}
+    return res * f;
 }
 
-void modify(int x,int y,int k)
-{
-    int val = ((k >> 1) ? -inf : -1);
-    if(x < 0 || x >= n || y < 0 || y >= m) return;
-    if(val == -1)
-        vec.push_back(x * m + y);
-    mp[x * m + y] = val;
-}
+int T,n,m,a[MAXN],b[MAXN],pre[MAXN];
 
-void Solve_flag(int x,int y,int r)
+inline void operator += (pii &x,pii &y)
 {
-    for(int i = 0;i < r;i ++)
+    if(x.first != y.first)
     {
-        for(int j = 0;j + i < r;j ++)
-        {
-            modify(x + i,y + j,r - i - j);
-            if(i) modify(x - i,y + j,r - i - j);
-            if(j) modify(x + i,y - j,r - i - j);
-            if(i && j) modify(x - i,y - j,r - i - j);
-        }
+        if(x.first > y.first) x = y;
     }
+    else if((x.second += y.second) >= mod)
+        x.second -= mod;
 }
 
-void bfs()
+struct Segmentree
 {
-    queue <int> q;
-    for(auto x : vec) q.push(x);
-    while(!q.empty())
+    int l,r;
+    pii val;
+}tree[MAXN << 2];
+void push_down(int rt)
+{
+    if (tree[rt].val.first == inf)
+        return;
+    tree[rt << 1].val += tree[rt].val;
+    tree[rt << 1 | 1].val += tree[rt].val;
+    tree[rt].val = mkp(inf,0);
+}
+void build(int l,int r,int rt)
+{
+    tree[rt].l = l,tree[rt].r = r;
+    tree[rt].val = {inf,0};
+    if(l == r)
     {
-        while(!q.empty())
-        {
-            int head = q.front(),x = head / m,y = head % m;
-            q.pop();
-            for(int i = 0;i < 4;i ++)
-            {
-                int nx = x + dx[i],ny = y + dy[i];
-                if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-                if(mp[nx * m + ny] > mp[head] + 1)
-                {
-                    mp[nx * m + ny] = mp[head] + 1;
-                    q.push(nx * m + ny);
-                }
-            }
-        }
+        if(l == 1) 
+            tree[rt].val = {0,1};
+        return;
     }
+    int mid = l + r >> 1;
+    build(l,mid,rt << 1);
+    build(mid + 1,r,rt << 1 | 1);
+}
+void upd(int ql,int qr,int rt,pii x)
+{
+    int l = tree[rt].l,r = tree[rt].r;
+    if(ql <= l && qr >= r)
+    {
+        tree[rt].val += x;
+        return;
+    }
+    int mid = l + r >> 1;
+    push_down(rt);
+    if(ql <= mid) upd(ql,qr,rt << 1,x);
+    if(qr > mid) upd(ql,qr,rt << 1 | 1,x);
+}
+
+pii que(int x,int rt)
+{
+    int l = tree[rt].l,r = tree[rt].r;
+    if(l == r) return tree[rt].val;
+    int mid = l + r >> 1;
+    push_down(rt);
+    return que(x,rt << 1 | (x > mid));
 }
 
 signed main()
 {
-    read(n),read(m),read(q);
-    int lenV = 1000;
-    for(int i = 0;i < n * m;i ++) mp[i] = inf;
-    for(int i = 1;i <= q;i ++)
+    T = read();
+    while(T --)
     {
-        read(x[i]),x[i] --;
-        read(y[i]),y[i] --;
-        read(r[i]);
-        if(r[i] >= n + m)
-            r[i] = n + m - 1;
-        if(mp[x[i] * m + y[i]] - r[i] + 1 >= 0)
+        pii Answer = {inf,0};
+        n = read(),m = read();
+        for(int i = 1;i <= n;i ++)
         {
-            flag[i] = 1;
-            for(int j = i - 1;j % lenV;j --)
+            a[i] = read();
+            pre[i] = pre[i - 1] + a[i];
+        }
+        for(int i = 1;i <= m;i ++) b[i] = read();
+        build(1,n,1);
+        for(int j = 1;j <= m;j ++)
+        {
+            pii tmp1;
+            tmp1 = {inf,0};
+            for(int i = 1;i <= n;i ++)
             {
-                if(flag[j])
+                int pos = upper_bound(pre + i,pre + n + 1,b[j] + pre[i - 1]) - (pre);
+                if(i < pos)
                 {
-                    if(abs(x[i] - x[j]) + abs(y[i] - y[j]) - r[i] - r[j] + 1 < 0)
+                    pii tmp2 = que(i,1);
+                    tmp2.first += m - j;
+                    if(pos == n + 1)
                     {
-                        flag[i] = 0;
-                        break;
+                        tmp1 += tmp2;
+                        pos --;
                     }
+                    if(i < pos) upd(i + 1,pos,1,tmp2);
                 }
             }
-            if(flag[i])
-            {
-                Answer ++;
-                Solve_flag(x[i],y[i],r[i]);
-            }
+            Answer += tmp1;
         }
-        if(i % lenV == 0) bfs();
-    }
-    printf("%d\n",Answer);
-    for(int i = 1;i <= q;i ++)
-    {
-        if(flag[i])
-            printf("%d ",i);
+        if(Answer.first == inf) printf("-1\n");
+        else printf("%lld %lld\n",Answer.first,Answer.second);
     }
     return 0;
-}
-signed main()
-{
-	int a,b;
-	scanf("%d%d",&a,&b);
-	cout << a + b;
-	return 0;
 }
