@@ -39,6 +39,6 @@ int main() {
         for (int i : b) cout << i << ' ';
         cout << endl;
     }
- 
+	
     return 0;
 }
