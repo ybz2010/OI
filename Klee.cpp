@@ -1,99 +1,131 @@
-#include <bits/extc++.h>
-#define int long long
+#include <bits/stdc++.h>
 using namespace std;
-int idx;
-int a[100005], id[100005], pre[100005];
-int ipr[100005], p[100005], skip[100005][25];
-int read()
+#define ll long long
+const int B = 13;
+ll gcd(ll x, ll y) { return x ? gcd(y % x, x) : y; }
+ll pb[B];
+bool leading_zero_needed = 0;
+ll n;
+int b;
+
+namespace subt_small_n
 {
-	int x = 0, f = 1;
-	char s = getchar();
-	while (s > '9' || s < '0')
+
+	bool first;
+	bool u[B];
+	void ss(ll x, int y, bool lz)
 	{
-		if (s == '-')
-			f = -1;
-		s = getchar();
-	}
-	while (s >= '0' && s <= '9')
-	{
-		x = x * 10 + s - '0';
-		s = getchar();
-	}
-	return x * f;
-}
-int ask(int x, int R)
-{
-	int res = 0;
-	for (int i = 20; i >= 0; --i)
-		if (skip[x][i] && skip[x][i] <= R)
+		if (y == b)
 		{
-			res += (1 << i);
-			x = skip[x][i];
-		}
-	return res + 1;
-}
-void makePrime(int N = 100000)
-{
-	for (int i = 2; i <= N; ++i)
-	{
-		if (!ipr[i])
-		{
-			p[++idx] = i;
-			id[i] = idx;
-		}
-		for (int j = 1; j <= idx && i * p[j] <= N; ++j)
-		{
-			ipr[i * p[j]] = 1;
-			if (i % p[j] == 0)
-				break;
-		}
-	}
-}
-signed main()
-{
-	makePrime();
-	int n = read(), Q = read();
-	for (int i = 1; i <= n; ++i)
-		a[i] = read();
-	for (int i = 1; i <= idx; ++i)
-		pre[i] = n + 1;
-	for (int j = 0; j <= 20; ++j)
-		skip[n + 1][j] = n + 1;
-	for (int i = n; i >= 1; --i)
-	{
-		int tmp = a[i];
-		int nxt = n + 1;
-		for (int j = 2; j * j <= tmp; ++j)
-		{
-			if (tmp % j == 0)
+			if (x % n == 0)
 			{
-				nxt = min(nxt, pre[id[j]]);
-				while (tmp % j == 0)
+				if (first)
 				{
-					tmp /= j;
+					cout << x;
+					exit(0);
 				}
-				pre[id[j]] = i;
+				else
+					first = 1;
+			}
+			return;
+		}
+		if (leading_zero_needed && y == 0)
+		{
+			ss(0, 1, 1);
+		}
+		else
+		{
+			for (int i = b - 1; i >= 0; --i)
+			{
+				if (!u[i])
+				{
+					if (i || !lz)
+						u[i] = 1;
+					ss(x + i * pb[b - y - 1], y + 1, lz && !i);
+					u[i] = 0;
+				}
 			}
 		}
-		if (tmp != 1)
-		{
-			nxt = min(nxt, pre[id[tmp]]);
-			pre[id[tmp]] = i;
-		}
-		// printf("\n");
-		skip[i][0] = min(skip[i + 1][0], nxt);
 	}
-	for (int i = n; i >= 1; --i)
+
+} // namespace subt_small_n
+
+namespace subt_large_n
+{
+
+	bool first;
+	void ss(ll x, int y, bool lz, int u)
 	{
-		for (int j = 1; j <= 20; ++j)
+		//	if(x==0)cerr<<"> "<<x<<" "<<y<<" "<<lz<<endl;
+		if (y == b - 5 && n > pb[5] && (x + n - 1) / n * n - x >= pb[5])
+			return;
+		if (y == b - 4 && n > pb[4] && (x + n - 1) / n * n - x >= pb[4])
+			return;
+		//	if(x==2625)cerr<<"! "<<x<<" "<<y<<" "<<lz<<"  "<<u<<endl;
+		if (y == b - 3)
 		{
-			skip[i][j] = skip[skip[i][j - 1]][j - 1];
+			ll z = (x + n - 1) / n * n - x;
+			if (z >= b * b * b)
+				return;
+			ll a[3] = {z / b / b, z / b % b, z % b};
+			//		cerr<<"a "<<a[0]<<" "<<a[1]<<" "<<a[2]<<"  "<<!((u>>a[0])&1)<<" "<<!((u>>a[1])&1)<<" "<<!((u>>a[2])&1)<<" "<<endl;
+			if (a[1] && a[1] == a[2])
+				return;
+			if ((a[0] || !lz) && (a[1] == a[2] || a[2] == a[0] || a[0] == a[1]))
+				return;
+			if ((a[0] || !lz) && !((u >> a[0]) & 1))
+				return;
+			if ((a[0] || a[1] || !lz) && !((u >> a[1]) & 1))
+				return;
+			if ((a[0] || a[1] || a[2] || !lz) && !((u >> a[2]) & 1))
+				return;
+			if (first)
+			{
+				cout << x + z;
+				exit(0);
+			}
+			else
+				first = 1;
+			return;
+		}
+		if (leading_zero_needed && y == 0)
+		{
+			ss(0, 1, 1, (1 << b) - 1);
+		}
+		else
+		{
+			int uu = u;
+			for (; u;)
+			{
+				int i = 31 - __builtin_clz(u);
+				ss(x + i * pb[b - y - 1], y + 1, lz && !i, uu ^ ((i || !lz) << i));
+				u ^= 1 << i;
+			}
 		}
 	}
-	while (Q--)
+
+}
+
+int main()
+{
+	cin >> n >> b;
+	int g = gcd(n, b - 1);
+	int s = b * (b - 1) / 2;
+	if (s % g)
+		leading_zero_needed = 1;
+	if (n % (b * b) == 0)
+		return cout << "-1" << endl, 0;
+	for (int i = pb[0] = 1; i <= b; i++)
+		pb[i] = pb[i - 1] * b;
+	if (n <= b * b * b || b <= 4)
 	{
-		int l = read(), r = read(), cnt = 0;
-		printf("%lld\n", ask(l, r));
+		subt_small_n::ss(0, 0, 1);
+		cout << "-1" << endl;
 	}
-	return 0;
+	else
+	{
+		subt_large_n::ss(0, 0, 1, (1 << b) - 1);
+		cout << "-1" << endl;
+	}
+	exit(0);
 }
