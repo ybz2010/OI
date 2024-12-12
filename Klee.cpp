@@ -1,36 +1,84 @@
 #include <bits/stdc++.h>
-// #define int long long
-
 using namespace std;
-template <typename T>
-inline void read(T &x){
-    T res = 0,f = 1;
+int read()
+{
+    int s = 0, w = 1;
     char ch = getchar();
-    while(!isdigit(ch)){if(ch == '-') f = -1;ch = getchar();}
-    while(isdigit(ch)){res = (res << 1) + (res << 3) + (ch ^ 48);ch = getchar();}
-    x = res * f;
-}
-
-const int maxn = 2e6 + 10;
-int n,m,p[maxn],apr[maxn];
-bool flag[maxn];
-
-signed main(){
-    read(n),read(m);
-    int Ta = max(n,m),Tb = sqrt(Ta) + 1;
-    for(int i = 1;i <= Ta;i ++) apr[i] = i;
-    flag[0] = flag[1] = 1;
-    for(int i = 2;i <= Tb;i ++){
-        if(!flag[i]){
-            for(int j = i;j <= Ta;j += i){
-                flag[j] = 1;
-                while(!(apr[j] % (i * i))) apr[j] /= (i * i);
-            }
-        }
+    while (ch < '0' || ch > '9')
+    {
+        if (ch == '-')
+            w = -1;
+        ch = getchar();
     }
-    int Answer = 0;
-    for(int i = 1;i <= n;i ++)
-        Answer += floor(sqrt(m / apr[i]));
-    printf("%d\n",Answer);
+    while (ch >= '0' && ch <= '9')
+        s = (s << 3) + (s << 1) + (ch ^ 48), ch = getchar();
+    return s * w;
+}
+const int maxn = 3010;
+vector<int> g2[maxn], g1[maxn], g3[maxn];//g是反图，z是正图，G是树
+char vis[maxn];
+int st[maxn], ans[400010], n, m, q;
+void add(int x, int y) { g2[y].push_back(x), g1[x].push_back(y); }
+void ADD(int x, int y) { g3[x].push_back(y); }
+void dfs1(int u)
+{
+    vis[u] = 1;
+    for (auto v : g2[u])
+        if (!vis[v])
+            dfs1(v);
+}
+struct query{int u,v,k,id;};
+vector<query> q1[maxn], q2[maxn];
+void dfs2(int u)
+{
+    st[++st[0]] = u;
+    for (auto i : q2[u])
+        if (st[0] >= i.k)
+            ans[i.id] = st[st[0] - i.k + 1];
+    for (auto v : g3[u])
+        dfs2(v);
+    st[0] --;
+}
+signed main()
+{
+    cin >> n >> m >> q;
+    int u,v,k;
+    for (int i = 1; i <= m; i++)
+    {
+        cin >> u >> v;
+        g1[u].push_back(v);
+        g2[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++)
+        sort(g1[i].begin(),g1[i].end());
+    for (int i = 1; i <= q; i++)
+    {
+        cin >> u >> v >> k;
+        q1[v].push_back((query){u,v,k,i});
+    }
+    memset(ans,0xff,sizeof ans);
+    for (int ed = 1; ed <= n; ed++)
+    {
+        for (int j = 1; j <= n; j++)
+        {
+            vis[j] = 0;
+            q2[j].clear();
+            g3[j].clear();
+        }
+        dfs1(ed);
+        for (int i = 1; i <= n; i++)
+            if (vis[i] && i != ed)
+                for (auto v : g1[i])
+                    if (vis[v])
+                    {
+                        ADD(v, i);
+                        break;
+                    }
+        for (auto y : q1[ed])
+            q2[y.u].push_back(y);
+        dfs2(ed);
+    }
+    for (int i = 1; i <= q; i++)
+        cout << ans[i] << '\n';
     return 0;
 }
