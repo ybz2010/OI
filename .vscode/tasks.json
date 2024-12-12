@@ -7,8 +7,11 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "-O2",
                 "-std=c++17",
+                "-O2",
+                "-Wall",
+                "-Wextra",
+                "-fno-ms-extensions",
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"

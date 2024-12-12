@@ -1,0 +1,1 @@
+对于在第 $j$ 个周期里的 $i$ ，它的逆序对数量是 $cnt_i \times (j-1) + cntl_i$ ，对于每一个周期里的 $i$ ，逆序对数量和是 $k \times cntl_i + cnt_i \times (1+2+3+...+k-1)=k \times cntl_i + k \times (k-1) \div 2 \times cnt_i$
