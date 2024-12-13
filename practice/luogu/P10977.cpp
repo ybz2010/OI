@@ -1,7 +1,7 @@
 #include<cstdio>
 #include<algorithm>
 #include<stack>
-#pragma GCC optimize(2)
+#define ri register
 #define int long long
 #define inf 0x7f7f7f7f7f7f
 #define ls (rt << 1)
@@ -14,8 +14,8 @@ int dp[maxn];
 void read(int &x)
 {
     x = 0;
-    int f(1);
-    char ch = getchar();
+    ri int f(1);
+    ri char ch = getchar();
     while (ch < '0' || ch > '9'){f = ch == '-' ? -1 : 1;ch = getchar();}
     while (ch >= '0' && ch <= '9'){x = x * 10 + ch - '0';ch = getchar();}
     x *= f;
@@ -48,15 +48,15 @@ void build(int l,int r,int rt)
         tree[rt].dp = tree[rt].ans = tree[rt].lazy = inf;
         return;
     }
-    int mid = (l + r) >> 1;
+    ri int mid = (l + r) >> 1;
     build(l,mid,ls);
     build(mid + 1,r,rs);
     push_up(rt);
 }
 void upd1(int pos,int rt = 1)
 {
-    int l(tree[rt].l);
-    int r(tree[rt].r);
+    ri int l(tree[rt].l);
+    ri int r(tree[rt].r);
     if (l == r)
     {
         tree[rt].dp = dp[pos - 1];
@@ -73,8 +73,8 @@ void upd1(int pos,int rt = 1)
 } 
 void upd2(int ql,int qr,int x,int rt = 1)
 {
-    int l(tree[rt].l);
-    int r(tree[rt].r);
+    ri int l(tree[rt].l);
+    ri int r(tree[rt].r);
     if (ql <= l && r <= qr)
     {
         tree[rt].ans = tree[rt].dp + x;
@@ -82,7 +82,7 @@ void upd2(int ql,int qr,int x,int rt = 1)
         return;
     }
     push_down(rt);
-    int mid((l + r) >> 1);
+    ri int mid((l + r) >> 1);
     if (ql <= mid)
         upd2(ql,qr,x,ls);
     if (qr > mid)
@@ -91,12 +91,12 @@ void upd2(int ql,int qr,int x,int rt = 1)
 }
 int que(int ql,int qr,int rt = 1)
 {
-    int l(tree[rt].l);
-    int r(tree[rt].r);
+    ri int l(tree[rt].l);
+    ri int r(tree[rt].r);
     if (ql <= l && r <= qr)
         return tree[rt].ans;
     push_down(rt);
-    int mid = (l + r) >> 1,ret = inf;
+    ri int mid = (l + r) >> 1,ret = inf;
     if (ql <= mid)
         ret = min(ret,que(ql,qr,ls));
     if (qr > mid)
@@ -107,7 +107,7 @@ void init()
 {
     stack<int>st;
     st.push(1);
-    for (int i = 2; i <= n; i++)
+    for (ri int i(2); i <= n; i++)
     {
         while (!st.empty() && h[i] > h[st.top()])
             st.pop();
@@ -120,7 +120,7 @@ void init()
 signed main()
 {
     read(n),read(m);
-    for (int i(1); i <= n; i++)
+    for (ri int i(1); i <= n; i++)
     {
         read(h[i]);
         if (h[i] > m)
@@ -131,7 +131,7 @@ signed main()
         sum[i] = sum[i - 1] + h[i];
     }
     init();
-    for (int i(1); i <= n; i++)
+    for (ri int i(1); i <= n; i++)
     {
         upd1(i);
         if (pos[i] < i)
