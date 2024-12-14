@@ -7,9 +7,9 @@ int randseed,n,m,q;
 int stu[maxn],idx,fw[maxn];
 int ex[maxn],ey[maxn],eu[maxn],ev[maxn];
 int x[maxn],y[maxn],t[maxn],u[maxn],v[maxn],id[maxn];
-struct node{
+struct edge{
 	int t,u,v,id,idx;
-	bool operator<(node x){return t < x.t;}
+	bool operator<(edge x){return t < x.t;}
 }a[maxn];
 unsigned int rnd()
 {

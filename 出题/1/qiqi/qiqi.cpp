@@ -3,11 +3,11 @@
 using namespace std;
 const int maxn = 5e5 + 5;
 int n,m;
-struct node
+struct edge
 {
     int a,v;
 }a[maxn];
-bool cmp(node x,node y){return x.v > y.v;}
+bool cmp(edge x,edge y){return x.v > y.v;}
 signed main()
 {
     scanf("%lld%lld",&n,&m);
