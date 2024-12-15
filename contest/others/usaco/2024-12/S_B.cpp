@@ -1,15 +1,14 @@
 #include<bits/stdc++.h>
-#define ll long long
 #define inf 0x3f3f3f3f3f3f3f3f
+typedef long long ll;
 using namespace std;
-const ll maxq = 5e5 + 5;
-struct edge
-{
+ll const maxn = 5e5 + 5;
+struct edge {
     ll v,w;
     edge *nxt;
-}*head[maxq];
-ll n,m,a[maxq],dis[maxq];
-ll u[maxq],v[maxq],w[maxq];
+}*head[maxn];
+ll n,m,a[maxn],dis[maxn];
+ll u[maxn],v[maxn],w[maxn];
 void adde(ll u,ll v,ll w) {
     auto tmp = new edge;
     tmp->v = v;
@@ -19,7 +18,7 @@ void adde(ll u,ll v,ll w) {
 }
 void spfa(ll st) {
     memset(dis,~0x3f,sizeof dis);
-    bool vis[maxq] = {};
+    bool vis[maxn] = {};
     queue<ll> q;
     dis[st] = 0;
     vis[st] = 1;

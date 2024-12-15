@@ -6,28 +6,24 @@ const int maxn = 1e6 + 5;
 const int dir[4][2] = {-1,0,1,0,0,-1,0,1};
 int n,q;
 int x[maxq],y[maxq],d[maxq];
-int ans[maxn],cnt;
+int ans[maxn],cnt = -1;
 bool vis[maxn],mp[maxn];
-struct edge
-{
+struct edge {
     int v;
     edge *nxt;
 }*head[maxn];
-int toint(int x,int y)
-{
+int toint(int x,int y) {
     if (x < 1 || x > n || y < 1 || y > n)
         return 0;
     return (x - 1) * n + y;
 }
-void adde(int u,int v)
-{
+void adde(int u,int v) {
     auto tmp = new edge;
     tmp->v = v;
     tmp->nxt = head[u];
     head[u] = tmp;
 }
-void dfs(int u)
-{
+void dfs(int u) {
     if (vis[u])
         return;
     vis[u] = 1;
@@ -35,19 +31,14 @@ void dfs(int u)
     for (auto i = head[u]; i; i = i->nxt)
         dfs(i->v);
 }
-signed main()
-{
-    ios::sync_with_stdio(0);
-    cin.tie(0);
-    cout.tie(0);
-    cin >> n >> q;
-    for (int i = 1; i <= q; i++)
-    {
+signed main() {
+    scanf("%lld%lld",&n,&q);
+    for (int i = 1; i <= q; i++) {
+        scanf("%lld%lld",x + i,y + i);
         char ch;
-        cin >> x[i] >> y[i] >> ch;
+        cin >> ch;
         mp[toint(x[i],y[i])] = 1;
-        switch (ch)
-        {
+        switch (ch) {
         case 'U':
             d[i] = 0;
             break;
@@ -65,31 +56,29 @@ signed main()
     }
     for (int i = 1; i <= n; i++)
         for (int j = 1; j <= n; j++)
-        {
-            // cout << i << " " << j << " " << mp[toint(i,j)] << endl;
             if (!mp[toint(i,j)])
                 for (int k = 0; k < 4; k++)
-                {
                     adde(toint(i + dir[k][0],j + dir[k][1]),toint(i,j));
-                    // cout << toint(i,j) << " " << toint(i + dir[k][0],j + dir[k][1]) << endl;
-                }
-        }
-    vis[0] = 1;
-    for (int i = q; i >= 1; i--)
-    {
+    for (int i = q; i >= 1; i--) {
         static int st = 0;
-        if (st )
-        dfs(st);
-        ans[i] = ans[i + 1];
-        
+        static bool fl = 1;
+        if (fl)
+            dfs(st);
+        ans[i] = n * n - cnt;
+        st = toint(x[i],y[i]);
+        fl = 0;
         for (int j = 0; j < 4; j++)
         {
             if (j == d[i])
                 continue;
-            adde(toint(x[i],y[i]),toint(x[i] + dir[j][0],y[i] + dir[j][1]));
+            int tx = x[i] + dir[j][0];
+            int ty = y[i] + dir[j][1];
+            fl |= vis[toint(tx,ty)];
+            adde(toint(tx,ty),st);
         }
+        fl &= (!vis[st]);
     }
     for (int i = 1; i <= q; i++)
-        cout << n - ans[i] << endl;
+        printf("%lld\n",ans[i]);
     return 0;
 }
