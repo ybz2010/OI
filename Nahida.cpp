@@ -1,59 +1,49 @@
+#include<iostream>
 #include<cstdio>
 #include<cstring>
-#include<cstdlib>
-#include<cctype>
-#include<cmath>
-#include<iostream>
 #include<algorithm>
-#include<vector>
-#include<set>
-#include<map>
-#include<queue>
-#include<stack>
-typedef long long ll;
-typedef unsigned long long ull;
 using namespace std;
-const int P=2017;
-struct Matrix{
-    int a[31][31];
-    inline Matrix operator * (const Matrix &rhs)
-    {
-        Matrix ret;
-        memset(&ret,0,sizeof ret);
-        for(int i=0;i<=30;i++)
-            for(int j=0;j<=30;j++)
-                for(int k=0;k<=30;k++)
-                    (ret.a[i][j]+=a[i][k]*rhs.a[k][j]%P)%=P;
-        return ret;
-    }
-}mp;
-Matrix ksm(Matrix &a,int b)
-{
-    Matrix ret;
-    memset(&ret,0,sizeof ret);
-    for(int i=0;i<=30;i++) ret.a[i][i]=1;
-    while(b)
-    {
-        if(b&1) ret=ret*a;
-        a=a*a;b>>=1;
-    }
-    return ret;
+struct matrix{//用结构体存矩阵敲好使哒~
+	long long qwq[105][105];
+    int x,y;//x,y就是矩阵的行数和列数
+	matrix(){x=0,y=0;memset(qwq,0,sizeof(qwq));};//构造函数，刚听说这玩意，用着玩玩
+}; 
+matrix operator * (const matrix &a,const matrix &b){//重载“异或版矩阵乘法”的运算符
+	matrix c;
+	c.x=a.x,c.y=b.y;
+	for(int i=1;i<=a.x;i++){  
+		for(int j=1;j<=b.y;j++){
+			for(int k=1;k<=a.y;k++)
+			c.qwq[i][j]^=a.qwq[i][k]*b.qwq[k][j];//和矩阵乘法别无二致，只不过就是改成异或
+		}
+	}
+	return c;                   
 }
-int u,v,n,m,t;
-int main()
-{
-    scanf("%d%d",&n,&m);
-    for(int i=1;i<=m;i++)
-    {
-        scanf("%d%d",&u,&v);
-        mp.a[u][v]=1;mp.a[v][u]=1;
-    }
-    for(int i=0;i<=n;i++)
-        mp.a[i][i]=1;
-    for(int i=1;i<=n;i++) mp.a[i][0]=1;
-    int ans=0;
-    scanf("%d",&t);
-    Matrix anss=ksm(mp,t);
-    for(int i=0;i<=n;i++) (ans+=anss.a[1][i])%=P;
-    printf("%d\n",ans);
+matrix wyx[40];//存储e矩阵的2^i次方，取这个变量名是因为想借助神仙的力量AC本题
+long long f[105];//每个城市的初始魔法值（提醒：十年OI一场空……）
+int main(){
+	int n,m,q;
+	scanf("%d%d%d",&n,&m,&q);
+	for(int i=1;i<=n;i++)
+	scanf("%lld",&f[i]);
+	wyx[0].x=n,wyx[0].y=n;//初始化一开始的邻接矩阵（也就是2的0次方）的大小
+	for(int i=1;i<=m;i++){
+		int a,b;
+		scanf("%d%d",&a,&b);
+		wyx[0].qwq[a][b]=wyx[0].qwq[b][a]=1;//给邻接矩阵连上边
+	}
+	for(int i=1;i<32;i++)wyx[i]=wyx[i-1]*wyx[i-1];//利用快速幂的思想，处理出邻接矩阵2的i次方
+	while(q--){
+		long long x;
+		scanf("%lld",&x);
+        matrix ans;
+		for(int i=1;i<=n;i++)ans.qwq[1][i]=f[i];//一开始就是初始f值
+		ans.x=1,ans.y=n;
+		for(int i=0;i<32;i++){//开始进行二进制拆分
+			if((x>>i)&1)//如果这一位是1
+			ans=ans*wyx[i];//就乘上对应的2的i次方
+		}
+		printf("%lld\n",ans.qwq[1][1]);
+	}
+	return 0;
 }
