@@ -1,86 +1,42 @@
 #include <bits/stdc++.h>
-#define rg register
-#define il inline
-#define co const
-template <class T>
-il T read()
-{
-	rg T data = 0, w = 1;
-	rg char ch = getchar();
-	while (!isdigit(ch))
-	{
-		if (ch == '-')
-			w = -1;
-		ch = getchar();
-	}
-	while (isdigit(ch))
-		data = data * 10 + ch - '0', ch = getchar();
-	return data * w;
-}
-template <class T>
-il T read(rg T &x)
-{
-	return x = read<T>();
-}
 typedef long long ll;
-
-co int mod = 1e7 + 7;
-struct data
+using namespace std;
+const int mod = 1e9 + 7;
+const int MM = 436;
+int n, m;
+bool vis[MM];
+map<vector<int>, int> f[MM][MM];
+int dfs(vector<int> v, int x, int y)
 {
-	ll v[3][3];
-	data(int x = 0)
-	{
-		memset(v, 0, sizeof v);
-		v[0][0] = v[1][1] = v[2][2] = x;
-	}
-	ll *operator[](int a) { return v[a]; };
-	co ll *operator[](int a) co { return v[a]; };
-	data operator*(co data &a) co
-	{
-		data re;
-		for (int k = 0; k < 3; ++k)
-			for (int i = 0; i < 3; ++i)
-				if (v[i][k])
-					for (int j = 0; j < 3; ++j)
-						re[i][j] = (re[i][j] + v[i][k] * a[k][j]) % mod;
-		return re;
-	}
-} A;
-int a[100001];
-data pow(data x, int y)
-{
-	data re(1);
-	while (y)
-	{
-		if (y & 1)
-			re = re * x;
-		x = x * x, y >>= 1;
-	}
-	return re;
+	if (y < 0)
+		return 0;
+	if (x > m)
+		return 1;
+	if (f[x][y].count(v))
+		return f[x][y][v];
+	if (!vis[x])
+		return f[x][y][v] = 1ll * y * dfs(v, x + 1, y - 1) % mod;
+	int res = 0, lim = v.size();
+	vector<int> tmp;
+	for (int i = 1; i < lim; i++)
+		for (int j = 0; j < i; j++)
+		{
+			tmp.clear();
+			for (int k = 0; k < lim; k++)
+				if (k != i && k != j)
+					tmp.push_back(v[k]);
+			tmp.push_back(v[i] + v[j]);
+			sort(tmp.begin(), tmp.end());
+			res = (res + 1ll * v[i] * v[j] * dfs(tmp, x + 1, y + v[i] * v[j] - 1) % mod) % mod;
+		}
+	return f[x][y][v] = res;
 }
 int main()
 {
-	//	freopen(".in","r",stdin);
-	//	freopen(".out","w",stdout);
-	int n = read<int>(), k = read<int>();
-	ll sum = 0;
-	for (int i = 1; i <= n; ++i)
-		sum += read(a[i]);
-	std::sort(a + 1, a + n + 1);
-	if (a[n] <= 0)
-		printf("%lld\n", ((sum + (ll)(a[n] + a[n - 1]) * k) % mod + mod) % mod);
-	else
-	{
-		for (sum -= a[n]; k && a[n - 1] < 0; --k)
-			a[n - 1] += a[n], sum += a[n - 1];
-		A[0][0] = A[0][1] = A[0][2] = A[1][0] = A[2][2] = 1, A = pow(A, k + 1);
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 3; j++)
-				printf("%lld ",A[i][j]);
-			putchar('\n');
-		}
-		printf("%lld\n", ((sum + a[n] * A[0][2] + a[n - 1] * A[1][2]) % mod + mod) % mod);
-	}
+	scanf("%d", &n);
+	m = n * (n - 1) / 2;
+	for (int i = 1, x; i < n; i++)
+		scanf("%d", &x), vis[x] = true;
+	printf("%d\n", dfs(vector<int>(n, 1), 1, 0));
 	return 0;
 }
