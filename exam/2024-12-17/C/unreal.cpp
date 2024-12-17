@@ -4,8 +4,8 @@
 using namespace std;
 const dd stt = 1e8,ent = 1e-6,d = 0.99;
 const int maxn = 50005;
-random_device seed;
-mt19937 rnd(seed());
+// random_device seed;
+mt19937 rnd(0x114514);
 int n;
 int h[maxn],m[maxn],s[maxn];
 dd ah[maxn],am[maxn],ans = inf;
@@ -39,9 +39,8 @@ void SA()
     {
         int nh = rnd() % 12,nm = rnd() % 60,ns = rnd() % 60;
         dd nans = cost(nh,nm,ns);
-        if (nans < ans)
-            ans = nans;
-        else if (exp((nans - ans) * tmp) >= rnd())
+        dd delta = nans - ans;
+        if (exp(-delta / tmp) > rnd())
             ans = nans;
         tmp *= d;
     }
