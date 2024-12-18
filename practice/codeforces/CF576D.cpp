@@ -1,12 +1,10 @@
-#include <bits/extc++.h>
+#include<bits/extc++.h>
 #define inf 0x3f3f3f3f3f3f3f3f
 #define int long long
 using namespace std;
-
 const int maxn = 155;
 int n,m;
 int dis[maxn];
-int t,d;
 struct edge
 {
     int u,v,d;
@@ -66,28 +64,28 @@ void bfs()
     {
         int u = q.front();
         q.pop();
-        for (int a = 1; a <= n; a++)
+        for (int v = 1; v <= n; v++)
         {
-            if (base[u][a] && dis[a] == inf)
+            if (base[u][v] && dis[v] == inf)
             {
-                dis[a] = dis[u] + 1;
-                q.push(a);
+                dis[v] = dis[u] + 1;
+                q.push(v);
             }
         }
     }
 }
 signed main()
 {
-	cin >> n >> m;
-	for (int i = 1; i <= m; ++i)
+    cin >> n >> m;
+    for (int i = 1; i <= m; i++)
         cin >> e[i].u >> e[i].v >> e[i].d;
-	sort(e + 1, e + m + 1);
-	origin.a[1][1] = 1;
-	dp[n] = inf;
-	int ans = inf;
-	for (int i = 1; i <= m; i++)
-	{
-		if (ans < e[i].d)
+    sort(e + 1,e + m + 1);
+    origin[1][1] = 1;
+    int ans = inf,t = 0;
+	dis[n] = inf;
+    for (int i = 1; i <= m; i++)
+    {
+        if (ans < e[i].d)
             break;
         int d = e[i].d - t;
         t = e[i].d;
@@ -96,10 +94,10 @@ signed main()
         if (e[i + 1].d != e[i].d || i == m)
             bfs();
         ans = min(ans,t + dis[n]);
-	}
+    }
     if (ans == inf)
         cout << "Impossible";
     else
         cout << ans;
-	return 0;
+    return 0;
 }
