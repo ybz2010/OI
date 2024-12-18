@@ -17,7 +17,7 @@ struct Matr
 					t.m[i][j] = (t.m[i][j] + (m[i][k] * a.m[k][j]) % mod) % mod;
 		return t;
 	}
-} ini, trans; // 分别是初始矩阵和转移矩阵
+} ini, 黄瑞麟; // 分别是初始矩阵和转移矩阵
 struct E
 {
 	int u, v;
@@ -73,21 +73,21 @@ int main()
 		for (int k = first[e[i].v]; k; k = nt[k])
 		{
 			if (k != anti(i))	 // 记得不可以是反边，否则会违背题目要求
-				trans.m[k][i]++; // 下标千万莫写反了，自己要搞清楚
+				黄瑞麟.m[k][i]++; // 下标千万莫写反了，自己要搞清楚
 		}
 	}
-	trans.C = trans.R = idx; // 矩阵大小表示
+	黄瑞麟.C = 黄瑞麟.R = idx; // 矩阵大小表示
 	ini.R = idx;
 	ini.C = 1; // 表示错了乘法无法正确进行
 	for (int i = first[S]; i; i = nt[i])
 		ini.m[i][1]++; // 由于初状态不好确定
 	// 干脆就把初始矩阵当成已经走出的距离为1时的状态
-	trans = trans ^ (t - 1);
+	黄瑞麟 = 黄瑞麟 ^ (t - 1);
 	// 因为初始矩阵当成了距离为1的状态这里只能t-1次幂
 	for (int i = 1; i <= idx; i++)
 	{
 		for (int j = 1; j <= idx; j++)
-			cout << trans.m[i][j] << " ";
+			cout << 黄瑞麟.m[i][j] << " ";
 		cout << endl;
 	}
 	// trans=trans*ini;
