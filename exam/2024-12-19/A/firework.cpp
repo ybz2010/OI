@@ -1,16 +1,16 @@
-//话说宵宫能够同一时间做多个烟花吗？
-//它能过我吃
 #include<bits/extc++.h>
-#define val (max(0,min(ur,vr) - max(ul,vl) + 1) * i->c)
+#define int long long
+#define inf 0x3f3f3f3f3f3f3f3f
 using namespace std;
 const int maxn = 1005;
 int n,m;
 int l[maxn],r[maxn],t[maxn];
-int dp[maxn][2];
+int dp[maxn][505];
 struct edge
 {
     int v,c;
     edge *nxt;
+    edge(int v = 0,int c = 0,edge *nxt = 0):v(v),c(c),nxt(nxt){};
 }*head[maxn];
 void adde(int u,int v,int c)
 {
@@ -22,28 +22,25 @@ void adde(int u,int v,int c)
 }
 void dfs(int u,int fa)
 {
-    bool leaf = 1;
     for (auto i = head[u]; i; i = i->nxt)
     {
         int v = i->v;
         if (v == fa)
             continue;
-        leaf = 0;
         dfs(v,u);
-        int ul,ur,vl,vr;
-        ul = l[u],ur = l[u] + t[u] - 1;
-        vl = l[v],vr = l[v] + t[v] - 1;
-        dp[u][0] = min(dp[u][0],dp[v][0] + val);
-        vr = r[v],vl = r[v] - t[v] + 1;
-        dp[u][0] = min(dp[u][0],dp[v][1] + val);
-        ur = r[u],ur = r[u] - t[u] + 1;
-        vl = l[v],vr = l[v] + t[v] - 1;
-        dp[u][1] = min(dp[u][1],dp[v][0] + val);
-        vr = r[v],vl = l[v] - t[v] + 1;
-        dp[u][1] = min(dp[u][1],dp[v][1] + val);
+        int lu,ru,lv,rv,tmp;
+        for (int tu = 0; l[u] + tu + t[u] - 1 <= r[u]; tu++)
+        {
+            lu = l[u] + tu,ru = l[u] + tu + t[u] - 1;
+            tmp = inf;
+            for (int tv = 0; l[v] + tv + t[v] - 1 <= r[v]; tv++)
+            {
+                lv = l[v] + tv,rv = l[v] + tv + t[v] - 1;
+                tmp = min(tmp,dp[v][tv] + max(0ll,min(ru,rv) - max(lu,lv) + 1) * i->c);
+            }
+            dp[u][tu] += tmp;
+        }
     }
-    if (leaf)
-        dp[u][0] = dp[u][1] = 0;
 }
 signed main()
 {
@@ -53,14 +50,17 @@ signed main()
     cin >> n >> m;
     for (int i = 1; i <= n; i++)
         cin >> l[i] >> r[i] >> t[i];
-    for (int i = 1,u,v,c; i <= m; i++)
+    for (int i = 1; i <= m; i++)
     {
+        int u,v,c;
         cin >> u >> v >> c;
         adde(u,v,c);
         adde(v,u,c);
     }
-    memset(dp,0x3f,sizeof dp);
     dfs(1,-114514);
-    cout << min(dp[1][0],dp[1][1]);
+    int ans = inf;
+    for (int i = 0; l[1] + i + t[1] - 1 <= r[1]; i++)
+        ans = min(ans,dp[1][i]);
+    cout << ans;
     return 0;
 }

@@ -21,7 +21,7 @@ signed main()
         read(t[i]);
     read(q);
     int x,op;
-    while (q--)
+    while (q--) 
     {
         read(op);
         if (op == 1)

@@ -1,105 +1,120 @@
-#include <bits/extc++.h>
-#define inf 0x3f3f3f3f3f3f3f3f
-#define int long long
+#include <bits/stdc++.h>
+#define maxn 5000010
 using namespace std;
+int T, n, t, f[maxn], w[maxn], dep[maxn], lson[maxn], rbro[maxn], mxu[maxn], mxv[maxn], siz[maxn], win[maxn];
+bool vis[maxn];
+long long a, b, ans;
 
-const int maxn = 155;
-int n,m;
-int dis[maxn];
-int t,d;
-struct edge
+inline int read()
 {
-    int u,v,d;
-    friend bool operator<(edge x,edge y){return x.d < y.d;};
-}e[maxn];
-struct mat
-{
-    bitset<maxn>a[maxn];
-    mat()
+    int s = 0, f = 1;
+    char ch = getchar();
+    while (ch < '0' || ch > '9')
     {
-        for (int i = 1; i <= 150; i++)
-            for (int j = 1; j <= 150; j++)
-                a[i][j] = 0;
-    };
-    bitset<maxn> &operator[](int x){return a[x];}
-    void base()
-    {
-        for (int i = 1; i <= 150; i++)
-            a[i][i] = 1;
+        if (ch == '-')
+            f = -1;
+        ch = getchar();
     }
-    friend mat operator*(mat x,mat y)
+    while (ch >= '0' && ch <= '9')
     {
-        mat ret;
-        for (int i = 1; i <= n; i++)
-            for (int k = 1; k <= n; k++)
-                if (x[i][k])
-                    ret[i] |= y[k];
-        return ret;
+        s = s * 10 + ch - '0';
+        ch = getchar();
     }
-}base,origin;
-mat binpow(mat x,int y)
-{
-    mat ret;
-    ret.base();
-    while (y)
-    {
-        if (y & 1)
-            ret = ret * x;
-        x = x * x;
-        y >>= 1;
-    }
-    return ret;
+    return s * f;
 }
-void bfs()
+
+inline void write(long long x)
 {
-    queue<int>q;
-    memset(dis,0x3f,sizeof dis);
-    for (int i = 1; i <= n; i++)
-    {   
-        if (origin[1][i])
-        {
-            q.push(i);
-            dis[i] = 0;
-        }
-    }
-    while (!q.empty())
+    if (x < 0)
     {
-        int u = q.front();
-        q.pop();
-        for (int a = 1; a <= n; a++)
+        putchar('-');
+        x = -x;
+    }
+    if (x > 9)
+        write(x / 10);
+    putchar(x % 10 + '0');
+}
+
+void dfs(int p, bool a)
+{
+    vis[p] = a;
+    if (siz[p] == 0)
+        return;
+    if (a || win[p] == 1)
+    {
+        for (int i = lson[p]; i; i = rbro[i])
+            if (a || !win[i])
+                dfs(i, !a);
+    }
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    T = read();
+    while (T--)
+    {
+        n = read();
+        t = read();
+        a = read();
+        b = read();
+        for (int i = 1; i <= n; i++)
         {
-            if (base[u][a] && dis[a] == inf)
+            vis[i] = dep[i] = win[i] = siz[i] = lson[i] = rbro[i] = 0;
+            mxu[i] = mxv[i] = 0x3F3F3F3F;
+        }
+        for (int i = 2; i <= n; i++)
+        {
+            f[i] = read();
+            dep[i] = dep[f[i]] + 1;
+            rbro[i] = lson[f[i]];
+            lson[f[i]] = i;
+            siz[f[i]]++;
+        }
+        for (int i = 1; i <= n; i++)
+        {
+            w[i] = read();
+        }
+        for (int i = n; i >= 1; i--)
+        {
+            if (!win[i])
+                win[f[i]]++;
+        }
+        if ((win[1] != 0) ^ t)
+        {
+            puts("0");
+            continue;
+        }
+        dfs(1, !t);
+        ans = 0x3F3F3F3F3F3F3F3Fll;
+        for (int i = n; i >= 1; i--)
+        {
+            if (vis[i])
+                mxu[i] = min(mxu[i], w[i]);
+            if (!win[i])
+                mxv[i] = min(mxv[i], w[i]);
+            if (siz[i])
             {
-                dis[a] = dis[u] + 1;
-                q.push(a);
+                int mmxu = mxu[lson[i]], mmxv = mxv[lson[i]];
+                for (int j = rbro[lson[i]]; j; j = rbro[j])
+                {
+                    if (mmxu != 0x3F3F3F3F && mxv[j] != 0x3F3F3F3F)
+                        ans = min(ans, a * mmxu + b * mxv[j]);
+                    if (mmxv != 0x3F3F3F3F && mxu[j] != 0x3F3F3F3F)
+                        ans = min(ans, a * mxu[j] + b * mmxv);
+                    mmxu = min(mmxu, mxu[j]);
+                    mmxv = min(mmxv, mxv[j]);
+                }
+                mxu[i] = min(mxu[i], mmxu);
+                mxv[i] = min(mxv[i], mmxv);
+                if (vis[i] && mmxv != 0x3F3F3F3F)
+                    ans = min(ans, a * w[i] + b * mmxv);
             }
         }
+        if (ans != 0x3F3F3F3F3F3F3F3Fll)
+            write(ans), puts("");
+        else
+            puts("-1");
     }
-}
-signed main()
-{
-	cin >> n >> m;
-	for (int i = 1; i <= m; ++i)
-        cin >> e[i].u >> e[i].v >> e[i].d;
-	sort(e + 1, e + m + 1);
-	origin.a[1][1] = 1;
-	dp[n] = inf;
-	int ans = inf;
-	for (int i = 1; i <= m; i++)
-	{
-		if (ans < e[i].d)
-            break;
-        int d = e[i].d - t;
-        t = e[i].d;
-        origin = origin * binpow(base,d);
-        base[e[i].u][e[i].v] = 1;
-        if (e[i + 1].d != e[i].d || i == m)
-            bfs();
-        ans = min(ans,t + dis[n]);
-	}
-    if (ans == inf)
-        cout << "Impossible";
-    else
-        cout << ans;
-	return 0;
+    return 0;
 }
