@@ -1,87 +1,74 @@
 #include<bits/extc++.h>
-#define inf 0x3f3f3f3f3f3f3f3f
 #define int long long
+#define eps 1e-4
 using namespace std;
+using namespace __gnu_pbds;
 int m,q;
 int t[505];
-int cnt[505][3];
-void read(int &x)
+gp_hash_table<int,int>val,cnt;
+struct node{int cnt,val;};
+bool operator<(node x,node y){return x.cnt ^ y.cnt ? x.cnt > y.cnt : x.val < y.val;}
+set<node>st;
+bool check(int x)
 {
-    x = 0;
-    int f = 1;
-    char ch = getchar();
-    while (!isdigit(ch)){f = ch == '-' ? -1 : 1; ch = getchar();}
-    while (isdigit(ch)){x = (x << 1) + (x << 3) + (ch ^ 48); ch = getchar();}
-    x *= f;
+    double y = pow(x,1.0 / 3);
+    return abs(y - ceil(y)) < eps || abs(y - floor(y)) < eps;
+}
+int calc(int x)
+{
+    int ret = 1;
+    for (int i = 1; i <= m; i++)
+    {
+        int c = 0;
+        while (x % t[i] == 0)
+        {
+            x /= t[i];
+            c ++;
+        }
+        if (c % 3 == 1)
+            ret *= t[i] * t[i];
+        else if (c % 3 == 2)
+            ret *= t[i];
+    }
+    if (!check(x))
+        return 0;
+    return ret;
 }
 signed main()
 {
-    read(m);
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    cin >> m;
     for (int i = 1; i <= m; i++)
-        read(t[i]);
-    read(q);
-    int x,op;
-    while (q--) 
+        cin >> t[i];
+    cin >> q;
+    int op,x;
+    while (q--)
     {
-        read(op);
+        cin >> op;
         if (op == 1)
         {
-            read(x);
-            for (int i = 1; i <= m; i++)
-            {
-                int c = 0;
-                while (x % t[i] == 0)
-                {
-                    c ++;
-                    x /= t[i];
-                }
-                cnt[i][c % 3] ++;
-            }
-            for (int i = 1; i <= m; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                    cout << cnt[i][j] << " ";
-                cout << endl;
-            }
+            cin >> x;
+            val[x] = calc(x);
+            if (val[x] == -1)
+                continue;
+            st.erase({cnt[val[x]],val[x]});
+            cnt[val[x]] ++;
+            st.insert({cnt[val[x]],val[x]});
         }
         else if (op == 2)
         {
-            read(x);
-            for (int i = 1; i <= m; i++)
-            {
-                int c = 0;
-                while (x % t[i] == 0)
-                {
-                    c ++;
-                    x /= t[i];
-                }
-                cnt[i][c % 3] --;
-            }
-            for (int i = 1; i <= m; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                    cout << cnt[i][j] << " ";
-                cout << endl;
-            }
+            cin >> x;
+            val[x] = calc(x);
+            if (val[x] == -1)
+                continue;
+            st.erase({cnt[val[x]],val[x]});
+            cnt[val[x]] --;
+            st.insert({cnt[val[x]],val[x]});
         }
         else
-        {
-            int _max = -inf,ans = inf;
-            for (int i = 1; i <= m; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    if (cnt[i][j] > _max)
-                    {
-                        _max = cnt[i][j];
-                        ans = pow(t[i],(3 - j) % 3);
-                    }
-                    else if (cnt[i][j] == _max)
-                        ans = min(ans,(int)pow(t[i],(3 - j) % 3));
-                }
-            }
-            printf("%lld\n",ans);
-        }
+            cout << (*(st.begin())).val << endl;
     }
     return 0;
 }
