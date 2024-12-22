@@ -1,4 +1,7 @@
 #include <bits/extc++.h>
+#pragma GCC optimize(3)
+#pragma GCC optimize("Ofast")
+#pragma GCC optimize("inline")
 #define int long long
 #define ls tree[rt].lson
 #define rs tree[rt].rson
@@ -72,6 +75,7 @@ void multi(int ql,int qr,int x,int l,int r,int &rt)
 }
 signed main()
 {
+    freopen("data.txt","r",stdin);
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
@@ -98,6 +102,6 @@ signed main()
             add(1,a[i],x,1,_max,rt);
         }
     }
-    cout << (tree[rt].val + mod) % mod;
+    cout << (tree[rt].val + mod) % mod << " " << clock();
     return 0;
 }
