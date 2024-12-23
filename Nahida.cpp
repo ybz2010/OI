@@ -1,215 +1,167 @@
 #include <bits/stdc++.h>
+typedef long long LL;
 using namespace std;
-const int N = 5e5 + 4;
-int head[N], cnt, n, m, b[N], st[N], top, l[N], r[N];
-int d[N], nw[N], sz[N], id[N], cnta, fa[N];
-struct edge
+template <class T>
+inline void read(T &n)
 {
-	int v, nxt;
-} a[N << 1];
-struct seg
-{
-	int add, maxn;
-} s[N << 2];
-int read()
-{
-	int x = 0, f = 1;
-	char ch = getchar();
-	while (ch < '0' || ch > '9')
-	{
-		if (ch == '-')
-			f = -1;
+	n = 0;
+	int ch = getchar(), f;
+	while ((ch < '0' || ch > '9') && ch != '-')
 		ch = getchar();
-	}
+	f = (ch == '-' ? ch = getchar(), -1 : 1);
 	while (ch >= '0' && ch <= '9')
-	{
-		x = x * 10 + ch - '0';
-		ch = getchar();
-	}
-	return x * f;
+		n = n * 10 + (ch ^ 48), ch = getchar();
+	n *= f;
 }
-void pushup(int rt)
+int const maxn = 4e5 + 5;
+int b[maxn], a[maxn];
+int f[maxn][21];
+int child[maxn][2], stk[maxn], val[maxn];
+int dep[maxn];
+int LOG[maxn];
+int Mx[maxn * 4], tag[maxn * 4];
+
+void Dfs(int now, int d)
 {
-	s[rt].maxn = max(s[rt << 1].maxn, s[rt << 1 | 1].maxn);
+	dep[now] = d;
+	if (child[now][0])
+		Dfs(child[now][0], d + 1);
+	if (child[now][1])
+		Dfs(child[now][1], d + 1);
 }
-void pushdown(int rt)
+inline int GetMin(int tl, int tr)
 {
-	if (s[rt].add)
-	{
-		s[rt << 1].add += s[rt].add;
-		s[rt << 1 | 1].add += s[rt].add;
-		s[rt << 1].maxn += s[rt].add;
-		s[rt << 1 | 1].maxn += s[rt].add;
-		s[rt].add = 0;
-	}
+	int k = LOG[tr - tl + 1];
+	return min(f[tl][k], f[tr - (1 << k) + 1][k]);
 }
-void build(int l, int r, int rt)
+
+#define lc (x << 1)
+#define rc (x << 1 | 1)
+inline void Update(int x) { Mx[x] = max(Mx[lc], Mx[rc]); }
+inline void Add(int x, int num) { Mx[x] += num, tag[x] += num; }
+inline void Pushdown(int x)
 {
-	if (l == r)
-	{
-		s[rt].maxn = nw[l];
-		return;
-	}
-	int mid = (l + r) >> 1;
-	build(l, mid, rt << 1);
-	build(mid + 1, r, rt << 1 | 1);
-	pushup(rt);
+	if (tag[x])
+		Add(lc, tag[x]), Add(rc, tag[x]), tag[x] = 0;
 }
-void update(int l, int r, int rt, int L, int R, int w)
+void upd(int x, int tl, int tr, int i, int j, int num)
 {
-	if (L <= l && R >= r)
-	{
-		s[rt].add += w;
-		s[rt].maxn += w;
-		return;
-	}
-	pushdown(rt);
-	int mid = (l + r) >> 1;
-	if (L <= mid)
-		update(l, mid, rt << 1, L, R, w);
-	if (R > mid)
-		update(mid + 1, r, rt << 1 | 1, L, R, w);
-	pushup(rt);
+	if (i <= tl && tr <= j)
+		return Add(x, num);
+	Pushdown(x);
+	int mid = (tl + tr) >> 1;
+	if (i <= mid)
+		upd(lc, tl, mid, i, j, num);
+	if (j > mid)
+		upd(rc, mid + 1, tr, i, j, num);
+	Update(x);
 }
-void modify(int l, int r, int rt, int pos, int w)
+int que(int x, int tl, int tr, int i, int j)
 {
-	if (l == r)
-	{
-		s[rt].maxn = w;
-		return;
-	}
-	int mid = (l + r) >> 1;
-	pushdown(rt);
-	if (pos <= mid)
-		modify(l, mid, rt << 1, pos, w);
-	else
-		modify(mid + 1, r, rt << 1 | 1, pos, w);
-	pushup(rt);
+	if (i <= tl && tr <= j)
+		return Mx[x];
+	Pushdown(x);
+	int mid = (tl + tr) >> 1, re = -1;
+	if (i <= mid)
+		re = max(re, que(lc, tl, mid, i, j));
+	if (j > mid)
+		re = max(re, que(rc, mid + 1, tr, i, j));
+	return re;
 }
-int query(int l, int r, int rt, int L, int R)
-{
-	if (R == 0)
-		return 0;
-	if (L <= l && R >= r)
-		return s[rt].maxn;
-	int mid = (l + r) >> 1, res = -0x3f3f3f3f;
-	pushdown(rt);
-	if (L <= mid)
-		res = max(res, query(l, mid, rt << 1, L, R));
-	if (R > mid)
-		res = max(res, query(mid + 1, r, rt << 1 | 1, L, R));
-	return res;
-}
-void add(int u, int v)
-{
-	a[++cnt].v = v;
-	a[cnt].nxt = head[u];
-	head[u] = cnt;
-}
-void dfs(int u)
-{
-	id[u] = ++cnta, sz[u] = 1;
-	for (int i = head[u]; i != 0; i = a[i].nxt)
-	{
-		int v = a[i].v;
-		dfs(v);
-		sz[u] += sz[v];
-	}
-}
-void dfs2(int u, int fa)
-{
-	d[u] = d[fa] + 1, nw[id[u]] = d[u];
-	if (l[u])
-		dfs2(l[u], u);
-	if (r[u])
-		dfs2(r[u], u);
-}
+#undef lc
+#undef rc
+
 int main()
 {
-	n = read();
-	for (int i = 1; i <= n; i++)
-		b[i] = read(), b[i + n] = b[i];
-	int minn = 0x3f3f3f3f, pos = 0;
-	for (int i = 1; i <= 2 * n; i++)
-	{
-		int las = 0;
-		while (top > 0 && b[st[top]] >= b[i])
-			las = st[top], st[top] = 0, top--;
-		r[st[top]] = i;
-		l[i] = las;
-		st[++top] = i;
-		if (b[i] <= minn)
-			minn = b[i], pos = i;
-	}
-	for (int i = 1; i <= 2 * n; i++)
-	{
-		if (l[i])
-			add(i, l[i]);
-		if (r[i])
-			add(i, r[i]);
-	}
-	dfs(pos);
-
-	for (int i = 1; i <= top; i++)
-		st[i] = 0;
-	top = 0;
-	for (int i = 1; i <= n; i++)
-		l[i] = r[i] = 0;
-	minn = 0x3f3f3f3f, pos = 0;
-	for (int i = 1; i <= n; i++)
-	{
-		int las = 0;
-		while (top > 0 && b[st[top]] >= b[i])
-			las = st[top], st[top] = 0, top--;
-		r[st[top]] = i;
-		fa[i] = st[top];
-
-		l[i] = las;
-		fa[las] = i;
-
-		st[++top] = i;
-		if (b[i] <= minn)
-			minn = b[i], pos = i;
-	}
-	dfs2(pos, 0);
-	build(1, 2 * n, 1);
-	int ans = s[1].maxn, chg = 0;
-	for (int i = n + 1; i <= 2 * n; i++)
-	{
-		modify(1, 2 * n, 1, id[i - n], -0x3f3f3f3f);
-
-		int idx = r[i - n];
-		if (idx)
+	int n;
+	read(n);
+	LOG[1] = 0;
+	for (int i = 2; i <= n + n; ++i)
+		LOG[i] = LOG[i >> 1] + 1;
+	for (int i = 1; i <= n; ++i)
+		read(a[i]);
+	for (int i = 1; i <= n; ++i)
+		if (a[i] == 1)
 		{
-			update(1, 2 * n, 1, id[idx], id[idx] + sz[idx] - 1, -1);
-			if (fa[i - n])
-			{
-				if (idx > fa[i - n])
-					r[fa[i - n]] = idx, l[fa[i - n]] = 0;
-				else
-					l[fa[i - n]] = idx;
-			}
-			fa[idx] = fa[i - n];
+			for (int j = 1; j <= n; ++j, i = i % n + 1)
+				b[j] = a[i];
+			break;
 		}
+	for (int i = n + 1; i <= n + n; ++i)
+		b[i] = b[i - n];
+	for (int i = 1; i <= n + n; ++i)
+		f[i][0] = b[i];
+	for (int k = 1; k <= 19; ++k)
+		for (int i = 1; i + (1 << k) - 1 <= n + n; ++i)
+			f[i][k] = min(f[i][k - 1], f[i + (1 << (k - 1))][k - 1]);
+	/* 构造初始笛卡尔树 */
 
-		int las = 0;
-		while (top > 0 && b[st[top]] >= b[i])
-			las = st[top], st[top] = 0, top--;
-		r[st[top]] = i;
-		fa[i] = st[top];
-		modify(1, 2 * n, 1, id[i], query(1, 2 * n, 1, id[st[top]], id[st[top]]));
-
-		l[i] = las;
-		fa[las] = i;
-
-		st[++top] = i;
-		if (b[i] <= minn)
-			minn = b[i], pos = i;
-		update(1, 2 * n, 1, id[i], id[i] + sz[i] - 1, 1);
-
-		if (s[1].maxn < ans)
-			ans = s[1].maxn, chg = i - n;
+	int l = n + 1, r = n + n, top = 0;
+	for (int i = l; i <= r; ++i)
+	{
+		int x = b[i];
+		while (top && val[top] > x)
+			--top;
+		if (top)
+			child[stk[top]][1] = i;
+		child[i][0] = stk[top + 1];
+		stk[++top] = i;
+		val[top] = x;
+		stk[top + 1] = 0;
 	}
-	printf("%d %d\n", ans, chg);
+
+	Dfs(n + 1, 1);
+
+	for (int i = n + 1; i <= n + n; i++)
+		cout << dep[i] << " ";
+	for (int i = l; i <= r; ++i)
+		upd(1, 1, n + n, i, i, dep[i]);
+	int tmp = que(1, 1, n + n, l, r);
+	int ans = 0x7f7f7f7f, pos = 0;
+	if (tmp < ans)
+		ans = tmp, pos = l;
+	
+	for (int i = n; i > 1; --i)
+	{
+
+		/* 删掉最后一个 */
+		int del = i + n;
+		int tl = l, tr = r - 1, mid, tans;
+		while (tl <= tr)
+		{
+			mid = (tl + tr) >> 1;
+			if (GetMin(mid, r) < b[del])
+				tans = mid, tl = mid + 1;
+			else
+				tr = mid - 1;
+		}
+		upd(1, 1, n + n, tans + 1, del, -1);
+
+		/* 把刚刚删掉的插到第一个 */
+
+		int ins = i;
+		tl = l, tr = r - 1;
+		while (tl <= tr)
+		{
+			mid = (tl + tr) >> 1;
+			if (GetMin(l, mid) < b[ins])
+				tans = mid, tr = mid - 1;
+			else
+				tl = mid + 1;
+		}
+		int d = que(1, 1, n + n, tans, tans);
+		upd(1, 1, n + n, ins, ins, d);
+		upd(1, 1, n + n, ins, tans - 1, 1);
+
+		--l, --r;
+		int tmp = que(1, 1, n + n, l, r);
+		if (tmp < ans)
+			ans = tmp, pos = l;
+	}
+	int k = b[pos];
+	for (int i = 1; i <= n; ++i)
+		if (k == a[i])
+			printf("%d %d\n", ans, i - 1);
+
 	return 0;
 }
