@@ -13,7 +13,7 @@ struct edge
     int v;
     edge *nxt;
 }*head[maxn];
-struct Nahida
+struct 世界树上最纯净的枝丫
 {
     int l,r;
     int val,lazy;

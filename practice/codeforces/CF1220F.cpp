@@ -10,24 +10,24 @@ int lg[maxn],f[maxn][30],dep[maxn];
 
 #define ls (rt << 1)
 #define rs (rt << 1 | 1)
-struct Nahida{int l,r,val,lazy;}tree[maxn << 3];
-void push_up(int rt){tree[rt].val = max(tree[ls].val,tree[rs].val);}
+struct 世界树上最纯净的枝丫{int l,r,val,lazy;}世界树[maxn << 3];
+void push_up(int rt){世界树[rt].val = max(世界树[ls].val,世界树[rs].val);}
 void push_down(int rt)
 {
-    tree[ls].val += tree[rt].lazy;
-    tree[rs].val += tree[rt].lazy;
-    tree[ls].lazy += tree[rt].lazy;
-    tree[rs].lazy += tree[rt].lazy;
-    tree[rt].lazy = 0;
+    世界树[ls].val += 世界树[rt].lazy;
+    世界树[rs].val += 世界树[rt].lazy;
+    世界树[ls].lazy += 世界树[rt].lazy;
+    世界树[rs].lazy += 世界树[rt].lazy;
+    世界树[rt].lazy = 0;
 }
 void build(int l,int r,int rt)
 {
-    tree[rt].l = l;
-    tree[rt].r = r;
-    tree[rt].lazy = 0;
+    世界树[rt].l = l;
+    世界树[rt].r = r;
+    世界树[rt].lazy = 0;
     if (l == r)
     {
-        tree[rt].val = 0;
+        世界树[rt].val = 0;
         return;
     }
     int mid = (l + r) >> 1;
@@ -37,12 +37,12 @@ void build(int l,int r,int rt)
 }
 void upd(int ql,int qr,int x,int rt)
 {
-    int l = tree[rt].l;
-    int r = tree[rt].r;
+    int l = 世界树[rt].l;
+    int r = 世界树[rt].r;
     if (ql <= l && r <= qr)
     {
-        tree[rt].val += x;
-        tree[rt].lazy += x;
+        世界树[rt].val += x;
+        世界树[rt].lazy += x;
         return;
     }
     push_down(rt);
@@ -55,10 +55,10 @@ void upd(int ql,int qr,int x,int rt)
 }
 int que(int ql,int qr,int rt)
 {
-    int l = tree[rt].l;
-    int r = tree[rt].r;
+    int l = 世界树[rt].l;
+    int r = 世界树[rt].r;
     if (ql <= l && r <= qr)
-        return tree[rt].val;
+        return 世界树[rt].val;
     push_down(rt);
     int mid = (l + r) >> 1,ret = 0;
     if (ql <= mid)
@@ -70,7 +70,7 @@ int que(int ql,int qr,int rt)
 #undef ls
 #undef rs
 
-int ls[maxn],rs[maxn];
+int 左子树[maxn],柚子树[maxn];
 void read(int &x)
 {
     x = 0;
@@ -88,10 +88,10 @@ int get_min(int l,int r)
 void dfs(int u,int fa)
 {
     dep[u] = dep[fa] + 1;
-    if (ls[u])
-        dfs(ls[u],u);
-    if (rs[u])
-        dfs(rs[u],u);
+    if (左子树[u])
+        dfs(左子树[u],u);
+    if (柚子树[u])
+        dfs(柚子树[u],u);
 }
 signed main()
 {
@@ -124,11 +124,11 @@ signed main()
         while (top && b[st[top]] > b[i])
             top --;
         if (!top)
-            ls[i] = st[top + 1];
+            左子树[i] = st[top + 1];
         else
         {
-            ls[i] = rs[st[top]];
-            rs[st[top]] = i;
+            左子树[i] = 柚子树[st[top]];
+            柚子树[st[top]] = i;
         }
         st[++top] = i;
     }

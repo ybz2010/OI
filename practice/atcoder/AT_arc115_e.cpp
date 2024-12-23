@@ -10,11 +10,11 @@ const int maxn = 5e5 + 5;
 const int mod = 998244353;
 int n,cnt,_max,rt;
 int a[maxn];
-struct Nahida
+struct 世界树上最纯净的枝丫
 {
     int val;
     int lson,rson,add,mul;
-    Nahida() {mul = 1;};
+    世界树上最纯净的枝丫() {mul = 1;};
 }tree[maxn << 5];
 void push_up(int rt){tree[rt].val = (tree[ls].val + tree[rs].val + mod) % mod;}
 void push_down(int l,int r,int rt)

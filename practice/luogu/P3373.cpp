@@ -7,7 +7,7 @@ const int mod = 571373;
 const int maxn = 1e5 + 5;
 int n,q;
 int a[maxn];
-struct Nahida
+struct 世界树上最纯净的枝丫
 {
     int l,r,val;
     int add,mul;

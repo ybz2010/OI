@@ -7,7 +7,7 @@ int n,wei;
 int a[maxn],pre[maxn];
 int dp[maxn],cnt[maxn];
 deque<int>q;
-struct Nahida
+struct 世界树上最纯净的枝丫
 {
     int l,r,min1,max1;
 }tree[maxn << 2];

@@ -1,10 +1,10 @@
 #include<stdio.h>
 const int maxn = 3e5 + 5;
 int n,q,idx,rt;
-struct Nahida
+struct 世界树上最纯净的枝丫
 {
     int val,lazy,ls,rs;
-    Nahida(){lazy = -1;};
+    世界树上最纯净的枝丫(){lazy = -1;};
 }tree[maxn * 55];
 inline int read()
 {

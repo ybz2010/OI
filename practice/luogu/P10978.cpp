@@ -5,8 +5,8 @@
 using namespace std;
 int n,k;
 int dp[105][16005];
-struct Nahida{int l,p,s;}a[105];
-bool operator<(const Nahida &x,const Nahida &y){return x.s < y.s;}
+struct 世界树上最纯净的枝丫{int l,p,s;}a[105];
+bool operator<(const 世界树上最纯净的枝丫 &x,const 世界树上最纯净的枝丫 &y){return x.s < y.s;}
 signed main()
 {
     ios::sync_with_stdio(0);

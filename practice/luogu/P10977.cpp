@@ -20,7 +20,7 @@ void read(int &x)
     while (ch >= '0' && ch <= '9'){x = x * 10 + ch - '0';ch = getchar();}
     x *= f;
 }
-struct Nahida
+struct 世界树上最纯净的枝丫
 {
     int ans,dp;
     int l,r,lazy;
