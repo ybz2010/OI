@@ -1,10 +1,13 @@
 #include<bits/extc++.h>
 using namespace std;
-long long a;
+int n;
 signed main()
 {
-    while(clock() < CLOCKS_PER_SEC)
-        a ++;
-    cout << a;
+    cin >> n;
+    srand(time(0));
+    for (int i = 1; i <= n; i++)
+    {
+        cout << (rand() & 1 ? "-" : "") << 1 << " ";
+    }
     return 0;
 }
