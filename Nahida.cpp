@@ -1,66 +1,56 @@
-#include "iostream"
-#include "algorithm"
-#include "cstring"
-#include "cstdio"
+#include <bits/stdc++.h>
+#define ll long long
 using namespace std;
-#define MAXN 125
-#define P 1000000000
-typedef long long ll;
-ll n, t, k;
 
-struct matrx
+void read(int &x)
 {
-    ll a[MAXN][MAXN];
-} G[70], tmp, cur;
-
-bool work(matrx &a)
+    x = 0;
+    char ch = getchar();
+    while (!isdigit(ch))
+        ch = getchar();
+    while (isdigit(ch))
+        x = x * 10 + (ch & 15), ch = getchar();
+}
+void write(ll x)
 {
-    ll p = 0;
-    for (ll i = 1; i <= n; ++i)
-        if ((k <= (p += a.a[i][0] - 1)))
-            return true;
-    return false;
+    if (x < 0)
+        putchar('-'), x = -x;
+    if (x > 9)
+        write(x / 10);
+    putchar('0' + x % 10);
 }
 
-void mul(matrx &x, matrx &y)
+const int maxn = 150010;
+int n, q, to[maxn], b[maxn];
+ll sum[maxn], res, now;
+struct node
 {
-    for (ll i = 0; i <= 3 * n; ++i)
-        for (ll j = 0; j <= 3 * n; ++j)
-        {
-            tmp.a[i][j] = 0;
-            for (ll p = 0; p <= 3 * n; ++p)
-                tmp.a[i][j] += x.a[i][p] * y.a[p][j];
-        }
-}
+    int val, id;
+    bool operator<(const node &rhs) const { return val < rhs.val; }
+} a[maxn];
 
-int main()
+signed main()
 {
-    ll m;
-    cin >> n >> m >> k;
-    G[0].a[0][0] = 1;
-    for (ll i = 1; i <= n; ++i)
-        cur.a[i][i] = G[0].a[i][0] = G[0].a[i][i + n] = G[0].a[i + n][i + 2 * n] = 1;
-    for (ll i = 0, u, v, w; i < m; ++i)
+    read(n);
+    for (int i = 1; i <= n; i++)
+        read(a[i].val), a[i].id = i;
+    sort(a + 1, a + n + 1);
+    for (int i = 1; i <= n; i++)
+        to[a[i].id] = i, res += 1ll * i * a[i].val;
+    for (int i = 1; i <= n; i++)
+        b[i] = a[i].val, sum[i] = sum[i - 1] + b[i];
+    read(q);
+    for (int i = 1, x, y; i <= q; i++)
     {
-        scanf("%lld%lld%lld", &u, &v, &w);
-        ++G[0].a[u + (w - 1) * n][v];
+        read(x), read(y);
+        now = res - 1ll * to[x] * b[to[x]];
+        int pos = lower_bound(b + 1, b + n + 1, y) - b;
+        now += 1ll * (pos - (pos > to[x])) * y;
+        if (pos > to[x])
+            now -= (sum[pos - 1] - sum[to[x]]);
+        if (pos < to[x])
+            now += (sum[to[x] - 1] - sum[pos - 1]);
+        write(now), putchar('\n');
     }
-    ll i;
-    for (i = 1;; ++i)
-    {
-        if (i > 65)
-            return puts("-1"), 0;
-        mul(G[i - 1], G[i - 1]), G[i] = tmp;
-        if (work(G[i]))
-            break;
-    }
-    long long ans = 0;
-    for (i--; ~i; --i)
-    {
-        mul(cur, G[i]);
-        if (!work(tmp))
-            cur = tmp, ans += (1ll << i);
-    }
-    cout << ans;
+    return 0;
 }
-// qwq
