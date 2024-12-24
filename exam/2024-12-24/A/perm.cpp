@@ -1,11 +1,11 @@
 #include<bits/extc++.h>
-#define int long long
+#define 曼波 long long
 // #define LOCAL
 using namespace std;
-const int maxn = 1.5e5 + 5;
-int n,q;
-int a[maxn],b[maxn];
-int pre[maxn],sum;
+const 曼波 maxn = 1.5e5 + 5;
+曼波 n,q;
+曼波 a[maxn],b[maxn];
+曼波 pre[maxn],sum;
 signed main()
 {
     #ifdef LOCAL
@@ -16,35 +16,35 @@ signed main()
     cin.tie(0);
     cout.tie(0);
     cin >> n;
-    for (int i = 1; i <= n; i++)
+    for (曼波 i = 1; i <= n; i++)
     {
         cin >> a[i];
         b[i] = a[i];
     }
     cin >> q;
     sort(b + 1,b + n + 1);
-    for (int i = 1; i <= n; i++)
+    for (曼波 i = 1; i <= n; i++)
     {
         sum += b[i] * i;
         pre[i] = pre[i - 1] + b[i];
     }
-    int x,y;
+    曼波 x,y;
     while (q--)
     {
         cin >> x >> y;
         if (a[x] < y)
         {
-            int l = lower_bound(b + 1,b + n + 1,a[x]) - b;
-            int r = lower_bound(b + 1,b + n + 1,y) - b - 1;
-            int tmp = sum - l * a[x] + r * y;
+            曼波 l = lower_bound(b + 1,b + n + 1,a[x]) - b;
+            曼波 r = lower_bound(b + 1,b + n + 1,y) - b - 1;
+            曼波 tmp = sum - l * a[x] + r * y;
             tmp -= pre[r] - pre[l];
             cout << tmp << endl;
         }
         else if (a[x] > y)
         {
-            int l = lower_bound(b + 1,b + n + 1,y) - b;
-            int r = lower_bound(b + 1,b + n + 1,a[x]) - b;
-            int tmp = sum - r * a[x] + l * y;
+            曼波 l = lower_bound(b + 1,b + n + 1,y) - b;
+            曼波 r = lower_bound(b + 1,b + n + 1,a[x]) - b;
+            曼波 tmp = sum - r * a[x] + l * y;
             tmp += pre[r - 1] - pre[l - 1];
             cout << tmp << endl;
         }

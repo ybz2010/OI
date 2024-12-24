@@ -1,8 +1,10 @@
 #include<bits/extc++.h>
 using namespace std;
+long long a;
 signed main()
 {
-    vector<int>a = {1,2,3,4,5,7,10};
-    cout << lower_bound(a.begin(),a.end(),6) - a.begin();
+    while(clock() < CLOCKS_PER_SEC)
+        a ++;
+    cout << a;
     return 0;
 }
