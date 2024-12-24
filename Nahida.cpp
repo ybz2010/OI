@@ -1,56 +1,60 @@
 #include <bits/stdc++.h>
-#define ll long long
 using namespace std;
-
-void read(int &x)
+typedef long long ll;
+const int inf = 0x3f3f3f3f;
+const ll mod = 1e9 + 7;
+const int N = 100005;
+int q, n;
+bool dp[61][1 << 20];
+int f[1 << 20];
+int shift(int x){return (x >> 1) + ((x & 1) << n - 1);}
+int main()
 {
-    x = 0;
-    char ch = getchar();
-    while (!isdigit(ch))
-        ch = getchar();
-    while (isdigit(ch))
-        x = x * 10 + (ch & 15), ch = getchar();
-}
-void write(ll x)
-{
-    if (x < 0)
-        putchar('-'), x = -x;
-    if (x > 9)
-        write(x / 10);
-    putchar('0' + x % 10);
-}
-
-const int maxn = 150010;
-int n, q, to[maxn], b[maxn];
-ll sum[maxn], res, now;
-struct node
-{
-    int val, id;
-    bool operator<(const node &rhs) const { return val < rhs.val; }
-} a[maxn];
-
-signed main()
-{
-    read(n);
-    for (int i = 1; i <= n; i++)
-        read(a[i].val), a[i].id = i;
-    sort(a + 1, a + n + 1);
-    for (int i = 1; i <= n; i++)
-        to[a[i].id] = i, res += 1ll * i * a[i].val;
-    for (int i = 1; i <= n; i++)
-        b[i] = a[i].val, sum[i] = sum[i - 1] + b[i];
-    read(q);
-    for (int i = 1, x, y; i <= q; i++)
+    scanf("%d%d", &q, &n);
+    const int m = 3 * n;
+    memset(f, -1, sizeof f);
+    for (int i = 0; i < 1 << n; i++)
     {
-        read(x), read(y);
-        now = res - 1ll * to[x] * b[to[x]];
-        int pos = lower_bound(b + 1, b + n + 1, y) - b;
-        now += 1ll * (pos - (pos > to[x])) * y;
-        if (pos > to[x])
-            now -= (sum[pos - 1] - sum[to[x]]);
-        if (pos < to[x])
-            now += (sum[to[x] - 1] - sum[pos - 1]);
-        write(now), putchar('\n');
+        int x = i;
+        while (f[x] == -1)
+            f[x] = i, x = shift(x);
+    }
+    dp[0][0] = 1;
+    for (int i = 1, z = 0; i <= m; i++)
+    {
+        z ^= 1 << (i - 1) % n;
+        for (int j = 0; j < 1 << n; j++)
+        {
+            dp[i][f[j]] |= dp[i - 1][f[j ^ z]];
+        }
+    }
+    while (q--)
+    {
+        int a = 0, b = 0;
+        for (int i = n - 1, x; i >= 0; i--)
+        {
+            scanf("%1d", &x);
+            a |= x << i;
+        }
+        for (int i = n - 1, x; i >= 0; i--)
+        {
+            scanf("%1d", &x);
+            b |= x << i;
+        }
+        if (a == 0)
+        {
+            puts("0");
+            continue;
+        }
+        for (int i = 1; ; i++, b = shift(b))
+        {
+            a ^= b;
+            if (dp[i][f[a]])
+            {
+                printf("%d\n", i);
+                break;
+            }
+        }
     }
     return 0;
 }
