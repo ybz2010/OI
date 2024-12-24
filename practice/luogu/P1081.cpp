@@ -11,6 +11,13 @@ struct city
     int pre,nxt;
 }a[maxn];
 bool operator<(city x,city y){return x.h < y.h;}
+void rm(int x)
+{
+    if (a[x].nxt)
+        a[a[x].nxt].pre = a[x].pre;
+    if (a[x].pre)
+        a[a[x].pre].nxt = a[x].nxt;
+}
 int choose(int x,int y,int i)
 {
     if (!x)
@@ -21,13 +28,6 @@ int choose(int x,int y,int i)
         return a[y].id;
     else
         return a[x].id;
-}
-void rm(int x)
-{
-    if (a[x].nxt)
-        a[a[x].nxt].pre = a[x].pre;
-    if (a[x].pre)
-        a[a[x].pre].nxt = a[x].nxt;
 }
 void calc(int st,int x)
 {
@@ -48,8 +48,6 @@ void calc(int st,int x)
 }
 signed main()
 {
-    freopen("P1081_2.in","r",stdin);
-    freopen("out.txt","w",stdout);
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
@@ -133,7 +131,6 @@ signed main()
         }
     }
     cout << ans << endl;
-    int q;
     cin >> q;
     while (q--)
     {
