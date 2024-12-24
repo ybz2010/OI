@@ -1,60 +1,63 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <ctime>
+#include <cstdlib>
+#include <vector>
+#include <map>
+#define int long long
 using namespace std;
-typedef long long ll;
-const int inf = 0x3f3f3f3f;
-const ll mod = 1e9 + 7;
-const int N = 100005;
-int q, n;
-bool dp[61][1 << 20];
-int f[1 << 20];
-int shift(int x){return (x >> 1) + ((x & 1) << n - 1);}
-int main()
+const int N = 3e5 + 10;
+const int mod = 1e12;
+int n;
+int a[N];
+map<int, int> mp;
+int f[N];
+vector<int> ve[N];
+signed main()
 {
-    scanf("%d%d", &q, &n);
-    const int m = 3 * n;
-    memset(f, -1, sizeof f);
-    for (int i = 0; i < 1 << n; i++)
+    int T;
+    scanf("%d", &T);
+    int re = 0, x, op, ans = 0;
+    while (T--)
     {
-        int x = i;
-        while (f[x] == -1)
-            f[x] = i, x = shift(x);
-    }
-    dp[0][0] = 1;
-    for (int i = 1, z = 0; i <= m; i++)
-    {
-        z ^= 1 << (i - 1) % n;
-        for (int j = 0; j < 1 << n; j++)
+        scanf("%d", &n);
+        ans = 0;
+        for (int i = 1; i <= n; ++i)
         {
-            dp[i][f[j]] |= dp[i - 1][f[j ^ z]];
+            scanf("%d", &a[i]);
+            ve[a[i]].push_back(i);
         }
-    }
-    while (q--)
-    {
-        int a = 0, b = 0;
-        for (int i = n - 1, x; i >= 0; i--)
+        for (int i = 1; i <= n; ++i)
         {
-            scanf("%1d", &x);
-            a |= x << i;
-        }
-        for (int i = n - 1, x; i >= 0; i--)
-        {
-            scanf("%1d", &x);
-            b |= x << i;
-        }
-        if (a == 0)
-        {
-            puts("0");
-            continue;
-        }
-        for (int i = 1; ; i++, b = shift(b))
-        {
-            a ^= b;
-            if (dp[i][f[a]])
+            if (ve[i].size() == 0)
+                continue;
+            if (ve[i].size() == 1)
+                f[ve[i][0]] = 0;
+            re = 0;
+            for (int j = 0; j < ve[i].size() - 1; ++j)
             {
-                printf("%d\n", i);
-                break;
+                x = rand() * rand() % mod * rand() % mod * rand() % mod;
+                op = rand() & 1;
+                if (op)
+                    x = -x;
+                f[ve[i][j]] = x;
+                re += x;
             }
+            f[ve[i][ve[i].size() - 1]] = -re;
         }
+        mp.clear();
+        re = 0;
+        mp[0] = 1;
+        for (int i = 1; i <= n; ++i)
+        {
+            re += f[i];
+            ans += mp[re];
+            ++mp[re];
+        }
+        printf("%lld\n", ans);
+        for (int i = 1; i <= n; ++i)
+            ve[i].clear();
     }
     return 0;
 }

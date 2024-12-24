@@ -11,6 +11,7 @@ bool vis[maxn],mp[maxn];
 struct edge {
     int v;
     edge *nxt;
+    ~edge(){if (nxt) delete nxt;}
 }*head[maxn];
 int toint(int x,int y) {
     if (x < 1 || x > n || y < 1 || y > n)
