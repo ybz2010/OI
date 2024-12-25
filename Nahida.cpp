@@ -1,49 +1,68 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define ll unsigned long long
-ll gcd(ll a, ll b)
+
+int n, m, a[1010][1010], b[1010][1010], vis[4010], instk[1010], flag;
+int head[4010], nxt[4010], to[4010], cnte;
+void addedge(int u, int v) { to[++cnte] = v, nxt[cnte] = head[u], head[u] = cnte; }
+
+void dfs(int u)
 {
-    ll temp;
-    while (b != 0)
+    if (instk[u])
     {
-        temp = a % b;
-        a = b;
-        b = temp;
+        flag = 1;
+        return;
     }
-    return a;
+    if (vis[u])
+        return;
+    instk[u] = vis[u] = 1;
+    for (int i = head[u]; i; i = nxt[i])
+        dfs(to[i]);
+    instk[u] = 0;
 }
-int main()
+
+void solve()
 {
-    ll l, r, g, n, m, flag;
-    int T;
-    cin >> T;
-    while (T--)
+    scanf("%d%d", &n, &m);
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            scanf("%d", &a[i][j]);
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            scanf("%d", &b[i][j]);
+    for (int k = 0; k < 30; k++)
     {
-        flag = 0;
-        cin >> n >> m >> g;
-        l = (n - 1) / g + 1;
-        r = m / g;
-        if ((l == r && l != 1) || l > r)
-        {
-            cout << -1 << " " << -1 << endl;
-        }
-        else if (l == r && l == 1)
-        {
-            cout << l * g << " " << r * g << endl;
-        }
-        else
-        {
-            for (ll i = r - l; flag == 0 && i >= 1; i--)
-            {
-                for (ll j = l; flag == 0 && j + i <= r; j++)
+        cnte = flag = 0;
+        for (int i = 0; i <= n + m + 10; i++)
+            head[i] = vis[i] = instk[i] = 0;
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= m; j++)
+                if (((b[i][j] >> k) & 1) == 1)
+                    addedge(i, n + j);
+        for (int j = 1; j <= m; j++)
+            for (int i = 1; i <= n; i++)
+                if (((b[i][j] >> k) & 1) == 0)
+                    addedge(n + j, i);
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= m; j++)
+                if (((a[i][j] >> k) & 1) != ((b[i][j] >> k) & 1))
                 {
-                    if (gcd(i, j) == 1)
-                    {
-                        flag = 1;
-                        cout << j * g << " " << (i + j) * g << endl;
-                    }
+                    addedge(0, ((a[i][j] >> k) & 1) ? i : n + j);
                 }
-            }
+        dfs(0);
+        if (flag)
+        {
+            puts("No");
+            return;
         }
     }
+    puts("Yes");
+}
+
+signed main()
+{
+    int t;
+    scanf("%d", &t);
+    while (t--)
+        solve();
+    return 0;
 }
