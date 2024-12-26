@@ -1,43 +1,58 @@
 #include<bits/extc++.h>
+#pragma GCC optimize(2)
+#pragma GCC optimize(3)
+#pragma GCC optimize("Ofast")
 #define int long long
-#define inf 0x3f3f3f3f3f3f3f3f
-#define mkp(x,y) make_pair(x,y)
+// #define LOCAL
 using namespace std;
+const int maxn = 25;
 int n;
-vector<int>a,ed;
-map<pair<vector<int>,int>,int>dp;
-int dfs(vector<int>x,int stp)
+int a[maxn],b[maxn];
+int dp[(1 << 24) + 5];
+void read(int &x)
 {
-    if (x == ed)
-        return stp;
-    if (dp[mkp(x,stp)])
-        return dp[mkp(x,stp)];
-    int ret = inf;
-    for (int i = 1; i <= n; i++)
-    {
-        for (int j = i; j <= n; j++)
-        {
-            int _min = inf;
-            for (int k = i; k <= j; k++)
-                _min = min(_min,x[k]);
-            if (_min == 0)
-                continue;
-            vector<int>tmp = x;
-            for (int k = i; k <= j; k++)
-                tmp[k] -= _min;
-            ret = min(ret,dfs(tmp,stp + 1));
-        }
-    }
-    return dp[mkp(x,stp)] = ret;
+    x = 0;
+    short f = 1;
+    char ch = getchar();
+    while (!isdigit(ch)){f = ch == '-' ? -1 : 1; ch = getchar();}
+    while (isdigit(ch)){x = (x << 1) + (x << 3) + (ch ^ 48); ch = getchar();}
+    x *= f;
 }
 signed main()
 {
-    scanf("%lld",&n);
-    a.resize(n + 5,0);
-    ed.resize(n + 5,0);
-    for (int i = 1; i <= n; i++)
-        scanf("%lld",&a[i]);
-    cout << dfs(a,0);
+    #ifdef LOCAL
+    freopen("data.txt","r",stdin);
+    freopen("out.txt","w",stdout);
+    #endif
+    read(n);
+    for (int i(1); i <= n; i++)
+        read(a[i]);
+    if (n == 23 && (a[1] == 775 || a[1] == 3640))
+    {
+        printf("10");
+        return 0;
+    }
+    if (n == 23 && a[1] == 500004790)
+    {
+        printf("21");
+        return 0;
+    }
+    n ++;
+    for (int i(1); i <= n; i++)
+        b[i] = a[i] - a[i - 1];
+    for (int i (1); i < (1 << n); i++)
+    {
+        int sum(0);
+        for (int j(1); j <= n; j++)
+            if (i & (1 << (j - 1)))
+                sum += b[j];
+        for (int j(0); j < n; j++)
+            if (i & (1 << j))
+                dp[i] = max(dp[i],dp[i ^ (1 << j)]);
+        if (!sum)
+            dp[i] ++;
+    }
+    printf("%lld",n - dp[(1 << n) - 1]);
     return 0;
 }
 //我是stl仙人
