@@ -3,12 +3,12 @@
 using namespace std;
 int x,l,r,cnt,idx;
 int s[12],a[15];
-unordered_map<int,int>dp[12][2];
+int dp[12][2][50005];
 int dfs(int idx,bool lim,bool zero,int left)
 {
     if (idx == 0)
         return left == 0 ? 1 : 0;
-    if (!lim && dp[idx][2].count(left))
+    if (!lim && ~dp[idx][2][left])
         return dp[idx][zero][left];
     int up = lim ? a[idx] : 9,ret = 0;
     for (int i = zero && s[1] ? 0 : 1; i <= cnt && s[i] <= up; i++)
@@ -21,11 +21,7 @@ int getans(int val)
 {
     idx = 0;
     memset(a,0,sizeof a);
-    for (int i = 0; i < 12; i++)
-    {
-        dp[i][0].clear();
-        dp[i][1].clear();
-    }
+    memset(dp,-1,sizeof dp);
     while (val)
     {
         a[++idx] = val % 10;

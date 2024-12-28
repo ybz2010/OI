@@ -1,74 +1,103 @@
 #include <bits/stdc++.h>
 using namespace std;
-inline int read()
+#define int long long
+#define pii pair<int, int>
+#define mkp make_pair
+#define REP(i, b, e) for (int i = (b); i < (int)(e); ++i)
+struct point
 {
-	int x = 0, f = 1;
-	char ch = getchar();
-	for (; ch < '0' || ch > '9'; ch = getchar())
-		if (ch == '-')
-			f = -1;
-	for (; ch >= '0' && ch <= '9'; ch = getchar())
-		x = (x << 1) + (x << 3) + (ch ^ 48);
-	return x * f;
+	int x, y, k;
+	bool operator<(point a) { return x == a.x ? y < a.y : x < a.x; }
+} a[50005];
+int n, k;
+int fa[50005], siz[50005];
+vector<int> v[50005];
+int findfa(int x) { return fa[x] == x ? x : fa[x] = findfa(fa[x]); }
+int merge(int x, int y)
+{
+	x = findfa(x);
+	y = findfa(y);
+	if (x == y)
+		return siz[x];
+	siz[x] += siz[y];
+	fa[y] = x;
+	return siz[x];
 }
-const int N = 2e3 + 5, mod = 1e9 + 9;
-int fac[N], inv[N];
-inline int ksm(int a, int b = mod - 2, int ans = 1)
+#define sq(x) ((x) * (x))
+int dist(int x, int y) { return sq(a[x].x - a[y].x) + sq(a[x].y - a[y].y); }
+bool check(int x)
 {
-	for (; b; b >>= 1, a = 1ll * a * a % mod)
-		if (b & 1)
-			ans = 1ll * ans * a % mod;
-	return ans;
-}
-inline void pre()
-{
-	fac[0] = 1;
-	for (int i = 1; i < N; i++)
-		fac[i] = 1ll * fac[i - 1] * i % mod;
-	inv[N - 1] = ksm(fac[N - 1]);
-	for (int i = N - 2; ~i; i--)
-		inv[i] = 1ll * inv[i + 1] * (i + 1) % mod;
-}
-inline int pl(int x)
-{
-	return x >= mod ? x - mod : x;
-}
-inline int C(int n, int m)
-{
-	if (n < m)
-		return 0;
-	return 1ll * fac[n] * inv[n - m] % mod * inv[m] % mod;
-}
-int n, cnt[N], num[N], a[N];
-int dp[N][N];
-signed main()
-{
-	n = read();
-	pre();
-	for (int i = 1; i <= n; i++)
+	set<pii> st;
+	int idx = -1;
+	iota(fa, fa + n, 0);
+	REP(i, 0, n)
+		siz[i] = 1;
+	REP(i, 0, n)
 	{
-		a[i] = read();
-		num[a[i]]++;
+		while (idx + 1 < i && sq(a[i].x - a[idx + 1].x) > x)
+			++idx, st.erase(st.find({a[idx].y, idx}));
+		for (auto j = st.lower_bound(mkp(a[i].y - ceil(sqrt(x)) - 1,-1)); j != st.end(); j++)
+		{
+			if (dist(j->second,i) <= x)
+            {
+                if (merge(i,j->second) >= k)
+                    return 1;
+            }
+		}
+		st.insert({a[i].y, i});
 	}
-	sort(a + 1, a + n + 1);
-	int len = unique(a + 1, a + n + 1) - a - 1;
-	for (int i = 1; i <= len; i++)
-		cnt[i] = num[a[i]];
-	int sum = 0;
-	dp[0][0] = 1;
-	for (int i = 1; i <= len; i++)
+	REP(i, 0, n)
+	v[i].clear();
+	REP(i, 0, n)
+	v[findfa(i)].push_back(a[i].k);
+	REP(i, 0, n)
+	if (fa[i] == i)
 	{
-		sum += cnt[i];
-		for (int j = 0; j <= sum; j++)
-			for (int k = 0; k <= min(j, cnt[i]); k++)
-				dp[i][j] = pl(dp[i][j] + 1ll * dp[i - 1][j - k] * C(sum - j, cnt[i] - k) % mod * C(cnt[i], k) % mod);
-		cout << cnt[i] << " ";
+		if (fa[i] != i)
+            continue;
+        bitset<30>b;
+        b[0] = 1;
+        for (auto j : v[i])
+        {
+            if (b[k - j])
+                return 1;
+            b |= (b << j) | (b >> (k - j));
+        }
 	}
-	int ans = 0;
-	for (int i = 0; i <= n; i++)
-	{
-		ans = pl(ans + pl(((i & 1) ? -1 : 1) * dp[len][i] + mod));
-	}
-	// printf("%d\n", ans);
 	return 0;
 }
+void Main()
+{
+	cin >> n >> k;
+	REP(i, 0, n)
+		cin >> a[i].x >> a[i].y >> a[i].k,
+		a[i].k %= k;
+	sort(a, a + n);
+	int l = 0, r = 2e16, res = 0;
+	while (l <= r)
+	{
+		int mid = (l + r) >> 1;
+		if (check(mid))
+			res = mid, r = mid - 1;
+		else
+			l = mid + 1;
+	}
+	cout << fixed << setprecision(3) << sqrt(res) << endl;
+}
+void TC()
+{
+	int tc = 1;
+	while (tc--)
+	{
+		Main();
+		cout.flush();
+	}
+}
+signed main()
+{;
+	return cin.tie(0), cout.tie(0), ios::sync_with_stdio(0), TC(), 0;
+}
+/*
+1. CLEAR the arrays (ESPECIALLY multitests)
+2. DELETE useless output
+*/
