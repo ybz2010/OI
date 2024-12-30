@@ -41,7 +41,7 @@ void init()
     int up = max(max(n,m),w);
     f[0][0] = 1;
     for (int i = 1; i <= up; i++)
-        for (int j = 1; j <= i; j++)
+        for (int j = 1; j <= i >> 1; j++)
             for (auto k = pr.begin(); k != pr.end() && *k <= i; k++)
                 f[i][j] = (f[i][j] + f[i - *k][j - 1]) % mod;
     up *= 3;
@@ -60,14 +60,14 @@ int dp(node x,node y)
     if (dx < 0 || dy < 0 || dz < 0)
         return 0;
     int ret = 0;
-    for (int sum = 0; sum <= dx + dy; sum++)
+    for (int sum = 0; sum <= (dx >> 1) + (dy >> 1); sum++)
     {
         int sum1 = 0;
-        for (int i = 0,j = sum; i <= sum; i++,j--)
-            if (i <= (dx >> 1) && j <= (dy >> 1))
+        for (int i = 0; i <= sum; i++)
+            if (int j = sum - i; i <= (dx >> 1) && j <= (dy >> 1))
                 sum1 = (sum1 + f[dx][i] * inv[i] % mod * f[dy][j] % mod * inv[j] % mod) % mod;
         int sum2 = 0;
-        for (int k = 0; k <= dz; k++)
+        for (int k = 0; k <= (dz >> 1); k++)
             sum2 = (sum2 + f[dz][k] * inv[k] % mod * fac[sum + k] % mod) % mod;
         ret = (ret + sum1 * sum2 % mod) % mod;
     }
@@ -81,7 +81,7 @@ signed main()
     scanf("%lld%lld%lld",&p1.x,&p1.y,&p1.z);
     scanf("%lld%lld%lld",&p2.x,&p2.y,&p2.z);
     init();
-    if (p1.x <= p2.x && p1.y <= p2.y && p1.z <= p2.z)
+    if (p2.x <= p1.x && p2.y <= p1.y && p2.z <= p1.z)
 		swap(p1, p2);
     int ans1 = dp(st,en);
     int ans2 = dp(st,p1) * dp(p1,en) % mod;
