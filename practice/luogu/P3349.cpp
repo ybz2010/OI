@@ -42,7 +42,6 @@ void dfs(int u,int fa)
                         sum += dp[v][a[j]];
                 dp[u][a[i]] *= sum;
             }
-            
         }
     }
 }
