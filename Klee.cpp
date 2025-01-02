@@ -1,100 +1,51 @@
-#include <cmath>
-#include <cstdio>
-#include <cstring>
-#include <iostream>
-#include <algorithm>
+#include <bits/stdc++.h>
+
+#define N 2010
+#define ll long long
+#define mod 924844033
+
 using namespace std;
-inline int read()
-{
-    int res = 0;
-    bool bo = 0;
-    char c;
-    while (((c = getchar()) < '0' || c > '9') && c != '-')
-        ;
-    if (c == '-')
-        bo = 1;
-    else
-        res = c - 48;
-    while ((c = getchar()) >= '0' && c <= '9')
-        res = (res << 3) + (res << 1) + (c - 48);
-    return bo ? ~res + 1 : res;
-}
-typedef long long ll;
-const int N = 20, M = 40;
-int n, m, ecnt, nxt[M], adj[N], go[M], tot, a[N];
-bool g[N][N], vis[N];
-ll dp[N][N], ans;
-inline void add_edge(const int &u, const int &v)
-{
-    nxt[++ecnt] = adj[u];
-    adj[u] = ecnt;
-    go[ecnt] = v;
-    nxt[++ecnt] = adj[v];
-    adj[v] = ecnt;
-    go[ecnt] = u;
-}
-inline void dfs(const int &u, const int &fu)
-{
-    int i, j;
-    for (int e = adj[u], v; e; e = nxt[e])
-    {
-        if ((v = go[e]) == fu)
-            continue;
-        dfs(v, u);
-    }
-    for (i = 1; i <= tot; i++)
-    {
-        int x = a[i];
-        dp[u][x] = 1;
-        for (int e = adj[u], v; e; e = nxt[e])
-        {
-            if ((v = go[e]) == fu)
-                continue;
-            ll sum = 0;
-            for (j = 1; j <= tot; j++)
-            {
-                int y = a[j];
-                if (!g[x][y])
-                    continue;
-                sum += dp[v][y];
-            }
-            dp[u][x] *= sum;
-        }
-    }
-}
-inline void solve()
-{
-    int i;
-    tot = 0;
-    for (i = 1; i <= n; i++)
-        if (vis[i])
-            a[++tot] = i;
-    dfs(1, 0);
-    for (i = 1; i <= tot; i++)
-        if (n - tot & 1)
-            ans -= dp[1][a[i]];
-        else
-            ans += dp[1][a[i]];
-}
-inline void Dfs(const int &dep)
-{
-    if (dep == n + 1)
-        return solve();
-    vis[dep] = 0;
-    Dfs(dep + 1);
-    vis[dep] = 1;
-    Dfs(dep + 1);
-}
+
+int n, k, tot, a[N];
+ll fac[N], dp[N << 1][N][2];
+bool vis[N << 1];
+
 int main()
 {
-    int i, x, y;
-    n = read();
-    m = read();
-    for (i = 1; i <= m; i++)
-        x = read(), y = read(), g[x][y] = g[y][x] = 1;
-    for (i = 1; i < n; i++)
-        x = read(), y = read(), add_edge(x, y);
-    Dfs(1);
-    cout << ans << endl;
+    scanf("%d%d", &n, &k);
+    fac[0] = 1;
+    for (int i = 1; i <= n; i++)
+        fac[i] = fac[i - 1] * i % mod;
+    for (int i = 1; i <= k; i++)
+    {
+        for (int t = 0; t < 2; t++)
+        {
+            for (int j = i; j <= n; j += k)
+            {
+                tot++;
+                if (i != j)
+                    vis[tot] = 1;
+            }
+        }
+    }
+    dp[0][0][0] = 1;
+    for (int i = 1; i <= (n << 1); i++)
+    {
+        for (int j = 0; j <= n; j++)
+        {
+            dp[i][j][0] = (dp[i - 1][j][0] + dp[i - 1][j][1]) % mod;
+            if (vis[i] && j)
+                dp[i][j][1] = dp[i - 1][j - 1][0];
+        }
+    }
+    ll ans = 0;
+    for (int i = 0; i <= n; i++)
+    {
+        if (i & 1)
+            ans = (ans - (dp[n << 1][i][0] + dp[n << 1][i][1]) * fac[n - i] % mod + mod) % mod;
+        else
+            ans = (ans + (dp[n << 1][i][0] + dp[n << 1][i][1]) * fac[n - i] % mod) % mod;
+    }
+    printf("%lld\n", ans);
     return 0;
 }
