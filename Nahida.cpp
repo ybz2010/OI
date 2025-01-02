@@ -1,91 +1,56 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+
 using namespace std;
-#define fz(i, a, b) for (int i = a; i <= b; i++)
-#define int long long
-typedef pair<int, int> pii;
-inline int read()
-{
-	int x = 0, neg = 1;
-	char c = getchar();
-	while (!isdigit(c))
+
+typedef long long ll;
+const int Mod = 1e9 + 9;
+const int N = 35, M = 15, L = 905;
+int g[N][N], f[N][N][M], c[L][L];
+int x, n, m, C, Ans;
+
+int main()
+{		
+	scanf("%d%d%d", &n, &m, &C);
+
+	const int tmp = n * m;
+	for (int i = 0; i <= tmp; ++i)
+		c[i][0] = 1;
+	for (int i = 1; i <= tmp; ++i)
+		for (int j = 1; j <= i; ++j)
+			c[i][j] = (c[i - 1][j] + c[i - 1][j - 1]) % Mod;
+	
+	f[0][0][0] = 1;
+	for (int k = 1; k <= C; ++k) 
 	{
-		if (c == '-')
-			neg = -1;
-		c = getchar();
-	}
-	while (isdigit(c))
-		x = x * 10 + c - '0', c = getchar();
-	return x * neg;
-}
-int n,m;
-int val[300005], l[300005], r[300005], a[25], b[25];
-const int mod = 998244353;
-int fac[300005], inv[300005];
-int binpow(int x,int y)
-{
-    int ret = 1;
-    while (y)
-    {
-        if (y & 1)
-            ret = ret * x % mod;
-        x = x * x % mod;
-        y >>= 1;
-    }
-    return ret;
-}
-inline void init()
-{
-	fac[0] = 1;
-    for (int i = 1; i <= 3e5; i++)
-        fac[i] = fac[i - 1] * i % mod;
-    inv[(int)3e5] = binpow(fac[(int)3e5],mod - 2);
-    for (int i = 3e5 - 1; ~i; i--)
-        inv[i] = inv[i + 1] * (i + 1) % mod;
-}
-int f[300005][45];
-int C(int n,int m){return n < 0 || m < 0 || n < m ? 0 : fac[n] * inv[m] % mod * inv[n - m] % mod;}
-signed main()
-{
-	init();
-	n = read(), m = read();
-	fz(i, 1, n)
-	{
-		l[i] = read(), r[i] = read();
-		val[l[i]]++;
-		val[r[i] + 1]--;
-	}
-	fz(i, 1, n)
-		val[i] += val[i - 1];
-	fz(i, 1, m) a[i] = read(), b[i] = read();
-	fz(j, 0, 30)
-		fz(i, 1, n)
-			f[i][j] = (f[i - 1][j] + C(val[i] - j, i - j)) % mod;
-	int ans = 0;
-	for (int k = 0; k < (1 << m); k++)
-	{
-		int tl = 1, tr = n;
-		set<int> st;
-		fz(i, 1, m)
-		{
-			if ((1 << (i - 1)) & k)
+		scanf("%d", &x);
+		memset(g, 0, sizeof(g));
+		for (int i = 1; i <= n; ++i)
+			for (int j = 1; j <= m; ++j)
+			if (i * j >= x)
 			{
-				tl = max(tl, l[a[i]]);
-				tr = min(tr, r[a[i]]);
-				st.insert(a[i]);
-				tl = max(tl, l[b[i]]);
-				tr = min(tr, r[b[i]]);
-				st.insert(b[i]);
+				g[i][j] = c[i * j][x];
+				for (int l = 1; l <= i; ++l)
+					for (int r = 1; r <= j; ++r)
+					if (l < i || r < j)
+						g[i][j] = ((ll)g[i][j] - (ll)g[l][r] * c[i][l] % Mod * c[j][r] % Mod + Mod) % Mod;
 			}
-		}
-		if (tl > tr)
-			continue;
-		int calc = (f[tr][st.size()] - f[tl - 1][st.size()] + mod) % mod;
-		int cnt1 = __builtin_popcount(k);
-		if (cnt1 & 1)
-			ans = (ans - calc + mod) % mod;
-		else
-			ans = (ans + calc) % mod;
+			
+		for (int i = 1; i <= n; ++i)
+			for (int j = 1; j <= m; ++j)
+				for (int l = 0; l < i; ++l)
+					for (int r = 0; r < j; ++r)
+					{
+						int tx = i - l, ty = j - r;
+						if (tx * ty >= x)
+							(f[i][j][k] += (ll)f[l][r][k - 1] * g[tx][ty] % Mod * c[n - l][tx] % Mod * c[m - r][ty] % Mod) %= Mod;
+					}
 	}
-	cout << ans << endl;
+	
+	for (int i = 1; i <= n; ++i)
+		for (int j = 1; j <= m; ++j)
+			(Ans += f[i][j][C]) %= Mod;
+	printf("%d\n", Ans);
 	return 0;
 }
