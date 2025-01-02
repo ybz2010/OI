@@ -1,93 +1,100 @@
-#include<bits/extc++.h>
-#define int long long
-#define Inv(x) binpow(x,mod - 2)
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <algorithm>
 using namespace std;
-const int maxn = 3005;
-const int mod = 1e9 + 7;
-int n,m,w;
-int fac[maxn],inv[maxn];
-int f[maxn][maxn];
-bool ipr[maxn];
-vector<int>pr;
-struct node
+inline int read()
 {
-    int x,y,z;
-}st,en,p1,p2;
-int binpow(int x,int y)
-{
-    int ret = 1;
-    while (y)
-    {
-        if (y & 1)
-            ret = ret * x % mod;
-        x = x * x % mod;
-        y >>= 1;
-    }
-    return ret;
+    int res = 0;
+    bool bo = 0;
+    char c;
+    while (((c = getchar()) < '0' || c > '9') && c != '-')
+        ;
+    if (c == '-')
+        bo = 1;
+    else
+        res = c - 48;
+    while ((c = getchar()) >= '0' && c <= '9')
+        res = (res << 3) + (res << 1) + (c - 48);
+    return bo ? ~res + 1 : res;
 }
-void init()
+typedef long long ll;
+const int N = 20, M = 40;
+int n, m, ecnt, nxt[M], adj[N], go[M], tot, a[N];
+bool g[N][N], vis[N];
+ll dp[N][N], ans;
+inline void add_edge(const int &u, const int &v)
 {
-    for (int i = 2; i <= 3000; i++)
+    nxt[++ecnt] = adj[u];
+    adj[u] = ecnt;
+    go[ecnt] = v;
+    nxt[++ecnt] = adj[v];
+    adj[v] = ecnt;
+    go[ecnt] = u;
+}
+inline void dfs(const int &u, const int &fu)
+{
+    int i, j;
+    for (int e = adj[u], v; e; e = nxt[e])
     {
-        if (!ipr[i])
-            pr.push_back(i);
-        for (auto j = pr.begin(); j != pr.end() && *j * i <= 3000; j++)
+        if ((v = go[e]) == fu)
+            continue;
+        dfs(v, u);
+    }
+    for (i = 1; i <= tot; i++)
+    {
+        int x = a[i];
+        dp[u][x] = 1;
+        for (int e = adj[u], v; e; e = nxt[e])
         {
-            ipr[*j * i] = 1;
-            if (i % *j == 0)
-                break;
+            if ((v = go[e]) == fu)
+                continue;
+            ll sum = 0;
+            for (j = 1; j <= tot; j++)
+            {
+                int y = a[j];
+                if (!g[x][y])
+                    continue;
+                sum += dp[v][y];
+            }
+            dp[u][x] *= sum;
         }
     }
-    int up = max(max(n,m),w);
-    f[0][0] = 1;
-    for (int i = 1; i <= up; i++)
-        for (int j = 1; j <= i; j++)
-            for (auto k = pr.begin(); k != pr.end() && *k <= i; k++)
-                f[i][j] = (f[i][j] + f[i - *k][j - 1]) % mod;
-    up *= 3;
-    fac[0] = 1;
-    for (int i = 1; i <= up; i++)
-        fac[i] = fac[i - 1] * i % mod;
-    inv[up] = Inv(fac[up]);
-    for (int i = up - 1; i >= 0; i--)
-        inv[i] = inv[i + 1] * (i + 1) % mod;
 }
-int dp(node x,node y)
+inline void solve()
 {
-    int dx = y.x - x.x;
-    int dy = y.y - x.y;
-    int dz = y.z - x.z;
-    if (dx < 0 || dy < 0 || dz < 0)
-        return 0;
-    int ret = 0;
-    for (int sum = 0; sum <= dx + dy; sum++)
-    {
-        int sum1 = 0;
-        for (int i = 0,j = sum; i <= sum; i++,j--)
-            if (i <= (dx >> 1) && j <= (dy >> 1))
-                sum1 = (sum1 + f[dx][i] * inv[i] % mod * f[dy][j] % mod * inv[j] % mod) % mod;
-        int sum2 = 0;
-        for (int k = 0; k <= dz; k++)
-            sum2 = (sum2 + f[dz][k] * inv[k] % mod * fac[sum + k] % mod) % mod;
-        ret = (ret + sum1 * sum2 % mod) % mod;
-    }
-    return ret;
+    int i;
+    tot = 0;
+    for (i = 1; i <= n; i++)
+        if (vis[i])
+            a[++tot] = i;
+    dfs(1, 0);
+    for (i = 1; i <= tot; i++)
+        if (n - tot & 1)
+            ans -= dp[1][a[i]];
+        else
+            ans += dp[1][a[i]];
 }
-signed main()
+inline void Dfs(const int &dep)
 {
-    scanf("%lld%lld%lld",&n,&m,&w);
-    st = {1,1,1};
-    en = {n,m,w};
-    scanf("%lld%lld%lld",&p1.x,&p1.y,&p1.z);
-    scanf("%lld%lld%lld",&p2.x,&p2.y,&p2.z);
-    init();
-    if (p1.x <= p2.x && p1.y <= p2.y && p1.z <= p2.z)
-		swap(p1, p2);
-    int ans1 = dp(st,en);
-    int ans2 = dp(st,p1) * dp(p1,en) % mod;
-    int ans3 = dp(st,p2) * dp(p2,en) % mod;
-    int ans4 = dp(st,p1) * dp(p1,p2) % mod * dp(p2,en) % mod;
-    int ans = (((ans1 + ans4) % mod - (ans2 + ans3) % mod) % mod + mod) % mod;
-    printf("%lld",ans);
+    if (dep == n + 1)
+        return solve();
+    vis[dep] = 0;
+    Dfs(dep + 1);
+    vis[dep] = 1;
+    Dfs(dep + 1);
+}
+int main()
+{
+    int i, x, y;
+    n = read();
+    m = read();
+    for (i = 1; i <= m; i++)
+        x = read(), y = read(), g[x][y] = g[y][x] = 1;
+    for (i = 1; i < n; i++)
+        x = read(), y = read(), add_edge(x, y);
+    Dfs(1);
+    cout << ans << endl;
     return 0;
 }
