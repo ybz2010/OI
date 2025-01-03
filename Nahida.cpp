@@ -1,77 +1,108 @@
 #include <bits/stdc++.h>
-#define int long long
-
 using namespace std;
-inline int read()
+#define fk1 500
+char *p1, *p2, buf[100000];
+#define nc() (p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 100000, stdin), p1 == p2) ? EOF : *p1++)
+int read()
 {
-	int res = 0, f = 1;
-	char ch = getchar();
-	while (!isdigit(ch))
-		ch = getchar();
-	while (isdigit(ch))
-		res = (res << 1) + (res << 3) + (ch ^ 48), ch = getchar();
-	return res * f;
-}
-const int maxn = 5e5 + 10;
-int n, v[maxn << 1], sum[maxn << 1];
-struct Ayaka
-{
-	int l, r, val;
-} seg[maxn << 4];
-
-inline void pushup(int rt) { seg[rt].val = min(seg[rt << 1].val, seg[rt << 1 | 1].val); }
-
-void Build(int l, int r, int rt)
-{
-	seg[rt].l = l, seg[rt].r = r;
-	if (l == r)
-		return;
-	int mid = l + r >> 1;
-	Build(l, mid, rt << 1), Build(mid + 1, r, rt << 1 | 1);
-	pushup(rt);
-}
-
-void update(int rt, int pos, int k)
-{
-	int l = seg[rt].l, r = seg[rt].r;
-	if (l == r)
+	int x = 0, f = 1;
+	char ch = nc();
+	while (ch < 48 || ch > 57)
 	{
-		seg[rt].val = k;
-		return;
+		if (ch == '-')
+			f = -1;
+		ch = nc();
 	}
-	int mid = l + r >> 1;
-	if (pos <= mid)
-		update(rt << 1, pos, k);
-	else
-		update(rt << 1 | 1, pos, k);
-	pushup(rt);
+	while (ch >= 48 && ch <= 57)
+		x = x * 10 + ch - 48, ch = nc();
+	return x * f;
 }
-
-int query(int ql, int qr, int rt)
+vector<int> cir[150001];
+vector<long long> pre[150001];
+vector<int> big;
+int bel[150001];
+int a[150001];
+long long sum[1001];
+int py[150001];
+int main()
 {
-	int l = seg[rt].l, r = seg[rt].r;
-	if (ql <= l && qr >= r)
-		return seg[rt].val;
-	int mid = l + r >> 1, tmpVal = 1e9;
-	if (ql <= mid)
-		tmpVal = min(tmpVal, query(ql, qr, rt << 1));
-	if (qr > mid)
-		tmpVal = min(tmpVal, query(ql, qr, rt << 1 | 1));
-	return tmpVal;
-}
-
-signed main()
-{
-	n = read(), Build(1, n << 1, 1);
-	for (int i = 1; i <= n; i++)
-		v[i] = read(), v[i + n] = v[i];
-	for (int i = 1; i <= (n << 1); i++)
-		sum[i] = sum[i - 1] + v[i];
-	int len = (n + 1) >> 1, Answer = 0;
-	for (int i = 1; i <= (n << 1); i++)
-		update(1, i, sum[i + len - 1] - sum[i - 1]);
-	for (int i = 1; i <= (n << 1); i++)
-		Answer = max(Answer, query(i, i + len - 1, 1));
-	printf("%lld\n", Answer);
+	freopen("in.txt","r",stdin);
+	freopen("out.txt","w",stdout);
+	int n, m, q, op, x, y, l, r;
+	long long g(0);
+	scanf("%d%d%d",&n,&m,&q);
+	for (int i = 0; i < n; ++i)
+	{
+		scanf("%d",bel + i);
+		cir[bel[i]].push_back(i);
+	}
+	for (int i = 0; i < n; ++i)
+	{
+		scanf("%d",a + i);
+		if (cir[bel[i]].size() <= fk1)
+			sum[i / 400] += a[i];
+		pre[bel[i]].push_back((long long)a[i] + (pre[bel[i]].size() ? pre[bel[i]][pre[bel[i]].size() - 1] : 0));
+	}
+	for (int i = 1; i <= m; ++i)
+		if (cir[i].size() > fk1)
+			big.push_back(i);
+	for (int i = 1; i <= q; ++i)
+	{
+		scanf("%d%d",&op,&x);
+		if (op == 1)
+		{
+			--x;
+			scanf("%d",&y);
+			y--;
+			g = 0;
+			for (int i : big)
+			{
+				l = lower_bound(cir[i].begin(), cir[i].end(), x) - cir[i].begin();
+				r = upper_bound(cir[i].begin(), cir[i].end(), y) - cir[i].begin() - 1;
+				if (r < l)
+				{
+					continue;
+				}
+				l = (l + py[i]) % cir[i].size();
+				r = (r + py[i]) % cir[i].size();
+				g = g + pre[i][r];
+				if (l)
+					g = g - pre[i][l - 1];
+				if (l > r)
+					g = g + pre[i][pre[i].size() - 1];
+			}
+			for (; x % 400 && x <= y; ++x)
+			{
+				if (cir[bel[x]].size() <= fk1)
+					g = g + a[x];
+			}
+			for (; y % 400 < 399 && x <= y; --y)
+			{
+				if (cir[bel[y]].size() <= fk1)
+					g = g + a[y];
+			}
+			if (x <= y)
+				for (; x <= y; x = x + 400)
+					g = g + sum[x / 400];
+			cout << g << '\n';
+		}
+		else
+		{
+			if (cir[x].size() <= fk1)
+			{
+				if (cir[x].size() >= 2)
+				{
+					for (int i = 0; i < cir[x].size(); ++i)
+						sum[cir[x][i] / 400] -= a[cir[x][i]];
+					for (int i = cir[x].size() - 1; i; --i)
+						swap(a[cir[x][i]], a[cir[x][i - 1]]);
+					for (int i = 0; i < cir[x].size(); ++i)
+						sum[cir[x][i] / 400] += a[cir[x][i]];
+				}
+			}
+			else
+				py[x] = py[x] > 0 ? py[x] - 1 : py[x] - 1 + cir[x].size();
+		}
+	}
 	return 0;
 }
