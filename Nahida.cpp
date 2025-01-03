@@ -51,7 +51,7 @@ struct long_int
 			printf("%d", d[i]);
 		puts("");
 	}
-} x, y, tmp1, tmp2;
+} x, y, ans1, ans2;
 
 void solve()
 {
@@ -75,17 +75,19 @@ void solve()
 			else
 			{
 				x.d[a--] = i;
-				tmp1 = x * y;
+				ans1 = x * y;
 				x.d[++a] = 0;
 				y.d[b--] = i;
-				tmp2 = x * y;
+				ans2 = x * y;
 				y.d[++b] = 0;
-				if (tmp1 < tmp2)
+				if (ans1 < ans2)
 					y.d[b--] = i;
 				else
 					x.d[a--] = i;
 			}
 		}
+	// x.write();
+	// y.write();
 	(x * y).write();
 }
 
