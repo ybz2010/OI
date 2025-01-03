@@ -1,27 +1,24 @@
-#include <iostream>
-#include <cstdio>
-#include <cstring>
+#include<bits/extc++.h>
 #define int long long
 using namespace std;
 const int mod = 1e9 + 9;
-const int N = 35, M = 15, L = 905;
-int tmp[N][N], dp[N][N][M], a[L][L];
-int cnt, n, m, c, ans;
-
+int n,m,c,cnt;
+int a[905][905];
+int dp[35][35][15];
 signed main()
 {
-	scanf("%lld%lld%lld", &n, &m, &c);
-
-	for (int i = 0; i <= n * m; ++i)
-		a[i][0] = 1;
-	for (int i = 1; i <= n * m; ++i)
-		for (int j = 1; j <= i; ++j)
-			a[i][j] = (a[i - 1][j] + a[i - 1][j - 1]) % mod;
-	dp[0][0][0] = 1;
+    scanf("%lld%lld%lld",&n,&m,&c);
+    for (int i = 0; i <= n * m; i++)
+        a[i][0] = 1;
+    for (int i = 1; i <= n * m; i++)
+        for (int j = 1; j <= i; j++)
+            a[i][j] = (a[i - 1][j] + a[i - 1][j - 1]) % mod;
+    dp[0][0][0] = 1;
+    int tmp[35][35];
     for (int k = 1; k <= c; k++)
     {
         scanf("%lld",&cnt);
-        int tmp[35][35] = {};
+        memset(tmp,0,sizeof tmp);
         for (int i = 1; i <= n; i++)
         {
             for (int j = 1; j <= m; j++)
@@ -46,9 +43,10 @@ signed main()
         #undef tx
         #undef ty
     }
+    int ans = 0;
     for (int i = 1; i <= n; i++)
         for (int j = 1; j <= m; j++)
             ans = (ans + dp[i][j][c]) % mod;
-	printf("%lld\n", ans);
-	return 0;
+    printf("%lld",ans);
+    return 0;
 }
