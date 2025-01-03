@@ -1,54 +1,56 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
-#define int long long
+
 using namespace std;
-const int mod = 1e9 + 9;
+
+typedef long long ll;
+const int Mod = 1e9 + 9;
 const int N = 35, M = 15, L = 905;
-int tmp[N][N], dp[N][N][M], a[L][L];
-int cnt, n, m, c, ans;
+int g[N][N], f[N][N][M], c[L][L];
+int x, n, m, C, Ans;
 
-signed main()
-{
-	scanf("%lld%lld%lld", &n, &m, &c);
+int main()
+{		
+	scanf("%d%d%d", &n, &m, &C);
 
-	for (int i = 0; i <= n * m; ++i)
-		a[i][0] = 1;
-	for (int i = 1; i <= n * m; ++i)
+	const int tmp = n * m;
+	for (int i = 0; i <= tmp; ++i)
+		c[i][0] = 1;
+	for (int i = 1; i <= tmp; ++i)
 		for (int j = 1; j <= i; ++j)
-			a[i][j] = (a[i - 1][j] + a[i - 1][j - 1]) % mod;
-	dp[0][0][0] = 1;
-    for (int k = 1; k <= c; k++)
-    {
-        scanf("%lld",&cnt);
-        int tmp[35][35] = {};
-        for (int i = 1; i <= n; i++)
-        {
-            for (int j = 1; j <= m; j++)
-            {
-                if (i * j < cnt)
-                    continue;
-                tmp[i][j] = a[i * j][cnt];
-                for (int x = 1; x <= i; x++)
-                    for (int y = 1; y <= i; y++)
-                        if (x < i || y < j)
-                            tmp[i][j] = ((tmp[i][j] - tmp[x][y] * a[i][x] % mod * a[j][y] % mod) % mod + mod) % mod;
-            }
-        }
-        #define tx (i - x)
-        #define ty (j - y)
-        for (int i = 1; i <= n; i++)
-            for (int j = 1; j <= m; j++)
-                for (int x = 0; x < i; x++)
-                    for (int y = 0; y < j; y++)
-                        if (tx * ty >= cnt)
-                            dp[i][j][k] = (dp[i][j][k] + dp[x][y][k - 1] * tmp[tx][ty] % mod * a[n - x][tx] % mod * a[m - y][ty] % mod) % mod;
-        #undef tx
-        #undef ty
-    }
-    for (int i = 1; i <= n; i++)
-        for (int j = 1; j <= m; j++)
-            ans = (ans + dp[i][j][c]) % mod;
-	printf("%lld\n", ans);
+			c[i][j] = (c[i - 1][j] + c[i - 1][j - 1]) % Mod;
+	
+	f[0][0][0] = 1;
+	for (int k = 1; k <= C; ++k) 
+	{
+		scanf("%d", &x);
+		memset(g, 0, sizeof(g));
+		for (int i = 1; i <= n; ++i)
+			for (int j = 1; j <= m; ++j)
+			if (i * j >= x)
+			{
+				g[i][j] = c[i * j][x];
+				for (int l = 1; l <= i; ++l)
+					for (int r = 1; r <= j; ++r)
+					if (l < i || r < j)
+						g[i][j] = ((ll)g[i][j] - (ll)g[l][r] * c[i][l] % Mod * c[j][r] % Mod + Mod) % Mod;
+			}
+			
+		for (int i = 1; i <= n; ++i)
+			for (int j = 1; j <= m; ++j)
+				for (int l = 0; l < i; ++l)
+					for (int r = 0; r < j; ++r)
+					{
+						int tx = i - l, ty = j - r;
+						if (tx * ty >= x)
+							(f[i][j][k] += (ll)f[l][r][k - 1] * g[tx][ty] % Mod * c[n - l][tx] % Mod * c[m - r][ty] % Mod) %= Mod;
+					}
+	}
+	
+	for (int i = 1; i <= n; ++i)
+		for (int j = 1; j <= m; ++j)
+			(Ans += f[i][j][C]) %= Mod;
+	printf("%d\n", Ans);
 	return 0;
 }

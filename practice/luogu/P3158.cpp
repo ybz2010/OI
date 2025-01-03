@@ -14,11 +14,10 @@ signed main()
         for (int j = 1; j <= i; j++)
             a[i][j] = (a[i - 1][j] + a[i - 1][j - 1]) % mod;
     dp[0][0][0] = 1;
-    int tmp[35][35];
     for (int k = 1; k <= c; k++)
     {
         scanf("%lld",&cnt);
-        memset(tmp,0,sizeof tmp);
+        int tmp[35][35] = {};
         for (int i = 1; i <= n; i++)
         {
             for (int j = 1; j <= m; j++)
@@ -27,7 +26,7 @@ signed main()
                     continue;
                 tmp[i][j] = a[i * j][cnt];
                 for (int x = 1; x <= i; x++)
-                    for (int y = 1; y <= i; y++)
+                    for (int y = 1; y <= j; y++)
                         if (x < i || y < j)
                             tmp[i][j] = ((tmp[i][j] - tmp[x][y] * a[i][x] % mod * a[j][y] % mod) % mod + mod) % mod;
             }
