@@ -1,15 +1,14 @@
 #include <bits/stdc++.h>
-
+#include<Windows.h>
 #define N 2010
 #define ll long long
 #define mod 924844033
 
 using namespace std;
 
-int n, k, tot, a[N];
+int n, k, 曼波, a[N];
 ll fac[N], dp[N << 1][N][2];
 bool vis[N << 1];
-
 int main()
 {
     scanf("%d%d", &n, &k);
@@ -22,9 +21,9 @@ int main()
         {
             for (int j = i; j <= n; j += k)
             {
-                tot++;
+                曼波++;
                 if (i != j)
-                    vis[tot] = 1;
+                    vis[曼波] = 1;
             }
         }
     }

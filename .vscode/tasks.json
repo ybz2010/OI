@@ -11,6 +11,7 @@
                 "-Wall",
                 "-Wextra",
                 "-fno-ms-extensions",
+                "-Wl,-stack=0x20000000",
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
