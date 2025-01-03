@@ -1,9 +1,8 @@
 #include<bits/extc++.h>
 using namespace std;
-const int maxn = 1e6 + 5;
+const int maxn = 2000 + 5;
 int a,b;
 int cnt[10];
-const int dir[10] = {0,1,1,0,0,1,1,0,0,1};
 class long_int
 {
     public:
@@ -77,55 +76,49 @@ class long_int
         }
         return ret;
     }
+    friend bool operator<(long_int x,long_int y)
+    {
+        if (x.len != y.len)
+            return x.len < y.len;
+        for (int i = x.len; i; i--)
+            if (x[i] != y[i])
+                return x[i] < y[i];
+        return 0;
+    }
 }x,y;
 void solve()
 {
     scanf("%d%d",&a,&b);
     if (a > b)
         swap(a,b);
-    int ta = x.len = a,tb = y.len = b;
+    x.len = a,y.len = b;
+    long_int ans1,ans2;
     for (int i = 1; i < 10; i++)
         scanf("%d",cnt + i);
     for (int i = 9; i; i--)
     {
-        if (dir[i])
+        while (cnt[i]--)
         {
-            while (1)
+            if (!a)
+                y[b--] = i;
+            else if (!b)
+                x[a--] = i;
+            else if (a == x.len && b == y.len)
+                x[a--] = i;
+            else if (b == y.len)
+                y[b--] = i;
+            else
             {
-                if (tb)
-                {
-                    cnt[i]--;
-                    y[tb--] = i;
-                    if (!cnt[i])
-                        break;
-                }
-                if (ta)
-                {
-                    cnt[i]--;
-                    x[ta--] = i;
-                    if (!cnt[i])
-                        break;
-                }
-            }
-        }
-        else
-        {
-            while (1)
-            {
-                if (ta)
-                {
-                    cnt[i]--;
-                    x[ta--] = i;
-                    if (!cnt[i])
-                        break;
-                }
-                if (tb)
-                {
-                    cnt[i]--;
-                    y[tb--] = i;
-                    if (!cnt[i])
-                        break;
-                }
+                x[a--] = i;
+                ans1 = x * y;
+                x[++a] = 0;
+                y[b--] = i;
+                ans2 = x * y;
+                y[b++] = 0;
+                if (ans1 < ans2)
+                    y[b--] = i;
+                else
+                    x[a--] = i;
             }
         }
     }
