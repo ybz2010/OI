@@ -7,7 +7,7 @@ using namespace std;
 const int mod = 12345678;
 const int dir[8][2] = 
 {
-    1,0,-1,0,0,1,0,
+    1,0,-1,0,0,1,0,-1,
     1,1,1,-1,-1,1,-1,-1
 };
 int n,m,tot,ans;
@@ -107,7 +107,7 @@ signed main()
         for (int j = 1; j <= m; j++)
         {
             cin >> ch;
-            mp[i][j] = (ch == '#');
+            mp[i][j] = (ch == 'X');
         }
     }
     dfs(1,1,0);
