@@ -1,14 +1,13 @@
 #include<bits/extc++.h>
 #define int long long
-#define sq(x) ((x) * (x))
 #define inf 0x3f3f3f3f3f3f3f3f
 using namespace std;
-const int maxn = 1e5 + 5;
-int n,cnt,rt;
-int h[maxn],w[maxn],dp[maxn];
-int k(int j){return -2 * h[j];}
-int x(int i){return h[i];}
-int b(int j){return dp[j] - w[j] + sq(h[j]);}
+const int maxn = 2e4 + 5;
+int n,tot,rt,cnt;
+int w[maxn],sum[maxn],dis[maxn];
+int k(int j){return sum[j];}
+int x(int i){return dis[i];}
+int b(int j){return -dis[j] * sum[j];}
 struct line
 {
     int k,b;
@@ -31,9 +30,8 @@ void upd(line ln,int l,int r,int &rt)
     {
         tree[rt].ln = ln;
         tree[rt].fl = 1;
-        return;
     }
-    else if (lque <= lpos && rque <= rpos)//新线段完全在原线段下
+    else if (lque < lpos && rque < rpos)
         tree[rt].ln = ln;
     else
     {
@@ -46,7 +44,7 @@ void upd(line ln,int l,int r,int &rt)
             upd(ln,mid + 1,r,tree[rt].rs);
     }
 }
-int que(int pos,int l,int r,int rt)
+int que(int pos,int l,int r,int &rt)
 {
     if (!rt)
         return inf;
@@ -54,30 +52,32 @@ int que(int pos,int l,int r,int rt)
     if (l == r)
         return ret;
     int mid = (l + r) >> 1;
-    int tmp;
     if (pos <= mid)
-        tmp = que(pos,l,mid,tree[rt].ls);
+        ret = min(ret,que(pos,l,mid,tree[rt].ls));
     else
-        tmp = que(pos,mid + 1,r,tree[rt].rs);
-    ret = min(ret,tmp);
+        ret = min(ret,que(pos,mid + 1,r,tree[rt].rs));
     return ret;
 }
 signed main()
 {
     scanf("%lld",&n);
     for (int i = 1; i <= n; i++)
-        scanf("%lld",h + i);
-    for (int i = 1; i <= n; i++)
     {
-        scanf("%lld",w + i);
-        w[i] += w[i - 1];
+        scanf("%lld%lld",w + i,dis + i);
+        sum[i] = sum[i - 1] + w[i];
     }
-    upd(line(k(1),b(1)),0,2e6,rt);
+    for (int i = n; i >= 1; i--)
+    {
+        dis[i] += dis[i + 1];
+        tot += dis[i] * w[i];
+    }
+    int ans = inf;
+    upd(line(k(1),b(1)),1,1e5,rt);
     for (int i = 2; i <= n; i++)
     {
-        dp[i] = que(x(i),0,2e6,rt) + w[i - 1] + sq(h[i]);
-        upd(line(k(i),b(i)),0,2e6,rt);
+        ans = min(ans,que(x(i),1,1e5,rt) + tot - dis[i] * sum[i]);
+        upd(line(k(i),b(i)),1,1e5,rt);
     }
-    printf("%lld",dp[n]);
+    printf("%lld",ans);
     return 0;
 }

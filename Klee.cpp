@@ -1,47 +1,34 @@
 #include<bits/extc++.h>
 #define int long long
+#define inf 0x3f3f3f3f3f3f3f3f
 using namespace std;
-const int mod = 998244353;
-int n,ans;
-vector<int>a;
-map<vector<int>,int>dp;
-int dfs(vector<int>v)
-{
-	if (dp.count(v))
-		return dp[v];
-	if (v.size() <= 2)
-		return 1;
-	int ret = 1;
-	for (auto i = v.begin() + 1; i != v.end() - 1; i++)
-	{
-		if (*(i - 1) > *i && *i < *(i + 1))
-		{
-			int tmp = *i;
-			v.erase(i);
-			ret = (ret + dfs(v));
-			v.insert(i,tmp);
-		}
-	}
-	return dp[v] = ret;
-}
-void solve()
-{
-	scanf("%lld",&n);
-	a.clear();
-	ans = 0;
-	for (int i = 1,x; i <= n; i++)
-	{
-		scanf("%lld",&x);
-		a.push_back(x);
-		ans = (ans + dfs(a));
-	}
-	printf("%lld\n",ans);
-}
+const int maxn = 2e4 + 5;
+int n,tot;
+int w[maxn],sum[maxn],dis[maxn];
+int dp[maxn];
 signed main()
 {
-	int t;
-	scanf("%lld",&t);
-	while (t--)
-		solve();
-	return 0;
+    scanf("%lld",&n);
+    for (int i = 1; i <= n; i++)
+    {
+        scanf("%lld%lld",w + i,dis + i);
+        sum[i] = sum[i - 1] + w[i];
+    }
+    for (int i = n; i >= 1; i--)
+    {
+        dis[i] += dis[i + 1];
+        tot += dis[i] * w[i];
+    }
+	cout << tot;
+    int ans = inf;
+    for (int i = 2; i <= n; i++)
+    {
+        dp[i] = inf;
+        for (int j = 1; j < i; j++)
+            dp[i] = min(dp[i],tot - dis[j] * sum[j] - dis[i] * (sum[i] - sum[j]));
+		cout << dp[i] << endl;;
+        ans = min(ans,dp[i]);
+    }
+    printf("%lld",ans);
+    return 0;
 }
