@@ -1,83 +1,42 @@
-#include <bits/stdc++.h>
+#include<bits/extc++.h>
+#define int long long
+#define sq(x) ((x) * (x))
 using namespace std;
-inline int read()
-{
-    int x = 0, f = 1;
-    char ch = getchar();
-    while (ch < '0' || ch > '9')
-    {
-        if (ch == '-')
-            f = -1;
-        ch = getchar();
-    }
-    while (ch >= '0' && ch <= '9')
-    {
-        x = (x << 1) + (x << 3) + (ch ^ 48);
-        ch = getchar();
-    }
-    return x * f;
-}
-const int maxn = 1e6 + 10, maxm = 610;
-int prime[maxn], val[maxn], tot;
-bool book[maxn];
-vector<int> v[maxn];
-map<vector<int>, vector<int>> mp;
+typedef long double ld;
+const int maxn = 3005;
+int n,m;
+int dis[maxn];
+int dp[maxn][maxn];
+int q[maxn],head,tail;
+int k(int i){return 2 * dis[i];}
+int x(int k){return dis[k];}
+int y(int k,int j){return dp[k][j - 1] + m * sq(dis[k]);}
+ld slope(int i,int k,int j){return ((ld)y(k,j) - (ld)y(i,j)) / ((ld)x(k) - (ld)x(i));}
 signed main()
 {
-    for (int i = 2; i < maxn; i++)
+    scanf("%lld%lld",&n,&m);
+    for (int i = 1; i <= n; i++)
     {
-        if (!book[i])
-        {
-            prime[++tot] = i;
-            val[i] = i;
-        }
-        for (int j = 1; j <= tot && prime[j] * i < maxn; j++)
-        {
-            book[i * prime[j]] = 1;
-            val[i * prime[j]] = prime[j];
-            if (i % prime[j] == 0)
-                break;
-        }
+        scanf("%lld",dis + i);
+        dis[i] += dis[i - 1];
     }
-    for (int i = 2; i < maxn; i++)
+    memset(dp,0x3f,sizeof dp);
+    dp[0][0] = 0;
+    for (int j = 1; j <= m; j++)
     {
-        v[i] = v[i / val[i]];
-        if (val[i] == val[i / val[i]])
-            v[i].back()++;
-        else
-            v[i].push_back(2);
-    }
-    for (int i = 2; i < maxn; i++)
-        sort(v[i].begin(), v[i].end(), greater<int>());
-
-    // auto &tmp1 = mp[v[1]];
-    mp[v[1]].resize(maxm);
-    mp[v[1]][1] = 0;
-    for (int i = 2; i < maxm; i++)
-        mp[v[1]][i] = mp[v[1]][i / val[i]] + val[i] - 1;
-
-    for (int i = 2; i < maxn; i++)
-    {
-        if (!mp.count(v[i]))
+        head = tail = 1;
+        q[1] = j - 1;
+        for (int i = j; i <= n; i++)
         {
-            auto tmp = v[i];
-            tmp.pop_back();
-            mp[v[i]].resize(maxm);
-            for (int j = 1; j < maxm; j++)
-                mp[v[i]][j] = mp[tmp][j] + v[i].back() - 1;
-            for (int j = 1; j < maxm; j++)
-                for (int k = 2; j * k < maxm; k++)
-                    mp[v[i]][j * k] = min(mp[v[i]][j * k], min(mp[tmp][j] + abs(v[i].back() - k), mp[v[i]][j] + k - 1));
+            while (tail > head && slope(q[head],q[head + 1],j) < k(i))
+                head++;
+            int k = q[head];
+            dp[i][j] = dp[k][j - 1] + m * sq(dis[i] - dis[k]) - 2 * (dis[i] - dis[k]) * dis[n];
+            while (tail > head && slope(q[tail - 1],q[tail],j) > slope(q[tail],i,j))
+                tail--;
+            q[++tail] = i;
         }
     }
-    for (int i = read(); i; i--)
-    {
-        int tmp2 = read(), tmp1 = read();
-        int ans = 0x3f3f3f3f;
-        auto &x = mp[v[tmp2]], &y = mp[v[tmp1]];
-        for (int j = 1; j < maxm; j++)
-            ans = min(ans, x[j] + y[j]);
-        printf("%d\n", ans);
-    }
+    printf("%lld",dp[n][m] + sq(dis[n]));
     return 0;
 }
