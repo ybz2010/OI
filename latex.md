@@ -1,13 +1,15 @@
 $$
 \begin{aligned}
-dp_{i} & = \min\{tot - dis_{j} \times sum_{j} - dis_{i} \times (sum_{i} - sum_{j}) \} \\
-& = \min\{tot - dis_{j} \times sum_{j} - dis_{i} \times sum_{i} + dis_{i} \times sum_{j} \} \\
-& = tot - dis_{i} \times sum_{i} + \min\{dis_{j} \times sum_{j} + dis_{i} \times sum_{j} \}
+dp_{i,j} & = \min\{dp_{k,j - 1} + m \times (dis_{i} - dis_{k})^{2} - 2len_{i} \times dis_{n} \} \\
+& = \min\{dp_{k,j - 1} + m \times (dis_{i}^{2} + dis_{k}^{2} - 2dis_{i}dis_{k}) - 2len_{i} \times dis_{n} \} \\
+& = \min\{dp_{k,j - 1} + m \times dis_{i}^{2} + m \times dis_{k}^{2} - 2m \times dis_{i}dis_{k} - 2len_{i}dis_{n} \} \\
+& = m \times dis_{i}^{2} - 2len_{i}dis_{n} + \min\{dp_{k,j - 1} + m \times dis_{k}^{2} - 2dis_{i}dis_{k} \}
 \end{aligned} \\
+b = y - kx \\
 \begin{aligned}
-k & = sum_{j} \\
-x & = dis_{i} \\
-b & = dis_{j} \times sum_{j} \\
-y & = dp_{i} - tot + dis_{i} \times sum_{i}
-\end{aligned}
+k & = 2dis_{i} \\
+x & = dis_{k} \\
+b & = dp_{i,j} - dis_{i}^{2} + 2len_{i}dis_{n}\\
+y & = dp_{k,j - 1} + m \times dis_{m}^{2}
+\end{aligned}\\
 $$
