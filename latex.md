@@ -1,15 +1,15 @@
 $$
 \begin{aligned}
-dp_{i} & = \min\{dp_{j} + w_{i - 1} - w_{j} + (h_{i} - h_{j})^2\} \\
-& = \min\{dp_{j} + w_{i - 1} - w_{j} + h_{i}^{2} + h_{j}^{2} - 2h_{i}h_{j}\} \\
-& = w_{i - 1} + h_{i}^{2} + \min\{dp_{j} - w_{j} + h_{j} ^ 2 - 2h_{i}h_{j}\} \\
+dp_{i,j} & = \min\{dp_{k,j - 1} + m \times (dis_{i} - dis_{k})^{2} - 2len_{i} \times dis_{n} \} \\
+& = \min\{dp_{k,j - 1} + m \times (dis_{i}^{2} + dis_{k}^{2} - 2dis_{i}dis_{k}) - 2len_{i} \times dis_{n} \} \\
+& = \min\{dp_{k,j - 1} + m \times dis_{i}^{2} + m \times dis_{k}^{2} - 2m \times dis_{i}dis_{k} - 2len_{i}dis_{n} \} \\
+& = m \times dis_{i}^{2} - 2len_{i}dis_{n} + \min\{dp_{k,j - 1} + m \times dis_{k}^{2} - 2dis_{i}dis_{k} \}
 \end{aligned} \\
+b = y - kx \\
 \begin{aligned}
-k &= -2h _ j \\
-x &= h _ i \\
-b &= dp _ j - w _ j + h _ j ^ 2\\
-y &= dp _ i - w _ {i - 1} - h _ i ^ 2
+k & = 2dis_{i} \\
+x & = dis_{k} \\
+b & = dp_{i,j} - dis_{i}^{2} + 2len_{i}dis_{n}\\
+y & = dp_{k,j - 1} + m \times dis_{m}^{2}
 \end{aligned}\\
-y = kx + b \\
-b = kx - y
 $$
