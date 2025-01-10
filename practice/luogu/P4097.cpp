@@ -44,7 +44,7 @@ void upd(int ql,int qr,line ln,int l,int r,int &rt)
             int mid = (l + r) >> 1;
             if (ln.f(mid) - tree[rt].ln.f(mid) > eps)
                 swap(ln,tree[rt].ln);
-            if (ln.f(l) > tree[rt].ln.f(l))
+            if (ln.f(l) - tree[rt].ln.f(l) > eps)
                 upd(ql,qr,ln,l,mid,tree[rt].ls);
             else
                 upd(ql,qr,ln,mid + 1,r,tree[rt].rs);
@@ -73,7 +73,7 @@ pdi que(int pos,int l,int r,int rt)
         tmp = que(pos,l,mid,tree[rt].ls);
     else
         tmp = que(pos,mid + 1,r,tree[rt].rs);
-    if(tmp.first > ret || (abs(tmp.first - ret) < eps && tmp.second < id))
+    if(tmp.first - ret > eps || (abs(tmp.first - ret) < eps && tmp.second < id))
         ret = tmp.first,id = tmp.second;
     return {ret,id};
 }
