@@ -1,34 +1,34 @@
-#include <bits/stdc++.h>
+#include<bits/extc++.h>
 #define int long long
 using namespace std;
-const int maxn = 1e5 + 10;
-int n, head, tail, q[maxn], sum[maxn], f[maxn], x, t[maxn], g[maxn], m, i, p, ans;
-int dp[105][maxn];
-int cal(int j,int i)
-{
-    return dp[i - 1][j] + sum[j];
-}
-long double slope(int k, int j,int i)
-{
-    return (long double)(cal(k,i) - cal(j,i)) / (k - j);
-}
+typedef long double ld;
+const int maxn = 1e5 + 5;
+int n,m,p;
+int dis[maxn],sum[maxn],t[maxn];
+int dp[105][maxn],q[maxn],head,tail;
+int x(int k){return k;}
+int y(int k,int i){return sum[k] + dp[i - 1][k];}
 int K(int j){return t[j];}
+ld slope(int j,int k,int i){return ((ld)y(k,i) - (ld)y(j,i)) / ((ld)x(k) - (ld)x(j));}
 signed main()
 {
-    cin >> n >> m >> p;
+    scanf("%lld%lld%lld",&n,&m,&p);
     for (int i = 2; i <= n; i++)
-        cin >> sum[i], sum[i] += sum[i - 1];
-    for (int i = 1; i <= m; i++)
     {
-        cin >> x >> t[i];
-        t[i] -= sum[x];
+        scanf("%lld",dis + i);
+        dis[i] += dis[i - 1];
     }
-    sort(t + 1, t + m + 1);
+    for (int i = 1,x; i <= m; i++)
+    {
+        scanf("%lld%lld",&x,t + i);
+        t[i] -= dis[x];
+    }
+    sort(t + 1,t + m + 1);
     for (int i = 1; i <= m; i++)
         sum[i] = sum[i - 1] + t[i];
     for (int i = 1; i <= m; i++)
-        dp[1][i] = i * (t[i]) - sum[i];
-    ans = dp[1][m];
+        dp[1][i] = t[i] * i - sum[i];
+    int ans = dp[1][m];
     for (int i = 2; i <= p; i++)
     {
         head = tail = 1;
