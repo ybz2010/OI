@@ -2,8 +2,8 @@
 #define int long long
 
 using namespace std;
-const int MAXN = 3e3 + 10, mod = 1e9 + 7;
-int n, m, k, mp[MAXN][MAXN], dp[MAXN], g[MAXN], _dp[MAXN], _g[MAXN];
+const int maxn = 3e3 + 10, mod = 1e9 + 7;
+int n, m, k, mp[maxn][maxn], dp[maxn], g[maxn], _dp[maxn], _g[maxn];
 
 inline int sum_dp(int l, int r)
 {

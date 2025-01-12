@@ -1,36 +1,41 @@
-#include <bits/stdc++.h>
-#define sq(x) ((x) * (x))
-#define eps 1e-12
+#include<bits/extc++.h>
 #define int long long
+#define sq(x) ((x) * (x))
 using namespace std;
-const int maxn = 1e5 + 10;
-int n, s[maxn], cnt[10001], c[maxn], dp[maxn], top[10001];
+typedef long double ld;
+const ld eps = 1e-10;
+const int maxn = 1e5 + 5;
+int n;
+int s[maxn],c[maxn],lst[maxn];
+int dp[maxn];
+vector<int>st[maxn];
+int x(int j){return c[j];}
+int y(int j){return dp[j - 1] + s[j] * sq(c[j]);}
 int k(int i){return 2 * s[i] * (c[i] + 1);}
-long double slope(int i, int j)
-{
-    return (long double)(dp[j - 1] + s[i] * c[j] * c[j] - dp[i - 1] - s[i] * c[i] * c[i]) / (c[j] - c[i]);
-}
-vector<int> st[10001];
+ld slope(int i,int j){return ((ld)y(j) - (ld)y(i)) / ((ld)x(j) - (ld)x(i));}
 signed main()
 {
-    cin >> n;
-    memset(top, -1, sizeof(top));
+    scanf("%lld",&n);
     for (int i = 1; i <= n; i++)
     {
-        cin >> s[i];
-        c[i] = ++cnt[s[i]];
+        scanf("%lld",s + i);
+        c[i] = c[lst[s[i]]] + 1;
+        lst[s[i]] = i;
+    }
+    for (int i = 1; i <= n; i++)
+    {
         dp[i] = dp[i - 1] + s[i];
         while (st[s[i]].size() > 1 && slope(st[s[i]][st[s[i]].size() - 1],st[s[i]][st[s[i]].size() - 2]) - k(i) < -eps)
-            --top[s[i]], st[s[i]].pop_back();
+            st[s[i]].pop_back();
         if (!st[s[i]].empty())
         {
             int j = st[s[i]].back();
             dp[i] = max(dp[i],dp[j - 1] + s[i] * sq(c[i] - c[j] + 1));
         }
         while (st[s[i]].size() > 1 && slope(st[s[i]][st[s[i]].size() - 2],st[s[i]][st[s[i]].size() - 1]) - slope(st[s[i]][st[s[i]].size() - 2],i) < -eps)
-            --top[s[i]], st[s[i]].pop_back();
-        ++top[s[i]];
+            st[s[i]].pop_back();
         st[s[i]].push_back(i);
     }
-    cout << dp[n] << endl;
+    printf("%lld",dp[n]);
+    return 0;
 }
