@@ -5,7 +5,7 @@ const int maxn = 1e5 + 5;
 const ld eps = 1e-15;
 int tot,n;
 int q[maxn],head,tail;
-ld dp[maxn],g[maxn];
+ld dp[maxn],cnt[maxn];
 inline ld x(int i){return (ld)1 / ld(n - i);}
 inline ld y(int i){return (ld)dp[i] - (ld)i / ld(n - i);}
 inline ld k(int i){return (ld)-i;}
@@ -19,12 +19,12 @@ bool check(ld mid)
             head++;
         int j = q[head];
         dp[i] = dp[j] + ld(i - j) / ld(n - j) - mid;
-        g[i] = g[j] + 1;
+        cnt[i] = cnt[j] + 1;
         while (head < tail && slope(q[tail],i) - slope(q[tail - 1],q[tail]) > -eps)
             tail--;
         q[++tail] = i;
     }
-    return g[n] >= tot;
+    return cnt[n] >= tot;
 }
 int main()
 {
