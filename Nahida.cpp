@@ -1,57 +1,92 @@
-#include <bits/stdc++.h>
-#define inl inline
-#define re register
-typedef long double ld;
+#include<bits/stdc++.h>
+#define LL long long
+#define LD long double
+#define ull unsigned long long
+#define fi first
+#define se second
+#define mk make_pair
+#define PLL pair<LL, LL>
+#define PLI pair<LL, int>
+#define PII pair<int, int>
+#define SZ(x) ((int)x.size())
+#define ALL(x) (x).begin(), (x).end()
+#define fio ios::sync_with_stdio(false); cin.tie(0);
+
 using namespace std;
-const int maxn = 100005, inf = 1e9;
-const double eps = 1e-14;
-inl int Read()
-{
-    re int s = 0, f = 1;
-    re char c;
-    while (!isdigit(c = getchar()))
-        if (c == '-')
-            f = -1;
-    for (; isdigit(c); c = getchar())
-        s = s * 10 + c - '0';
-    return s * f;
-}
-int n, tot, head, tail, q[maxn], g[maxn];
-ld dp[maxn];
-inline ld x(int i){return (ld)1 / ld(n - i);}
-inline ld y(int i){return (ld)dp[i] - (ld)i / ld(n - i);}
-inline ld k(int i){return (ld)-i;}
-inline ld slope(int i,int j){return (y(j) - y(i)) / (x(j) - x(i));}
-inl bool check(double mid)
-{
-    head = tail = 1;
-    for (re int i = 1; i <= n; ++i)
-    {
-        while (head < tail && slope(q[head],q[head + 1]) - k(i) > -eps)
-            ++head;
-        int j = q[head];
-        dp[i] = dp[j] + ld(i - j) / ld(n - j) - mid; // 由于是求最大值，应减去额外贡献才能让分段越多代价越大
-        g[i] = g[q[head]] + 1;
-        while (head < tail && slope(q[tail - 1], q[tail]) <= slope(q[tail], i))
-            --tail;
-        q[++tail] = i;
+
+const int N = 1e6 + 7;
+const int inf = 0x3f3f3f3f;
+const LL INF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+const double eps = 1e-8;
+const double PI = acos(-1);
+
+template<class T, class S> inline void add(T &a, S b) {a += b; if(a >= mod) a -= mod;}
+template<class T, class S> inline void sub(T &a, S b) {a -= b; if(a < 0) a += mod;}
+template<class T, class S> inline bool chkmax(T &a, S b) {return a < b ? a = b, true : false;}
+template<class T, class S> inline bool chkmin(T &a, S b) {return a > b ? a = b, true : false;}
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+
+int n;
+int stk[N], top;
+int match[N], a[N], b[N], up[N];
+int ans[N];
+char s[N];
+
+void init() {
+    for(int i = 1; i <= n + 5; i++) {
+        match[i] = 0;
+        a[i] = 0;
+        b[i] = 0;
+        up[i] = 0;
+        ans[i] = 0;
     }
-    return g[n] >= tot;
 }
-int main()
-{
-    n = Read();
-    tot = Read();
-    double l = 0.0, r = 1.0 * inf; // 因为 f 可取实数，所以二分的额外贡献也要取到实数
-    while (r - l >= eps)
-    {
-        re double mid = (l + r) * 0.5;
-        if (check(mid))
-            l = mid;
-        else
-            r = mid;
+
+int main() {
+    // int T; scanf("%d", &T);
+    int T = 1;
+    while(T--) {
+        scanf("%s", s + 1);
+        n = strlen(s + 1);
+        init();
+
+        top = 0;
+        for(int i = 1; i <= n; i++) {
+            if(s[i] == '(') {
+                up[i] = stk[top];
+                stk[++top] = i;
+            }
+            else if(top) {
+                match[i] = stk[top];
+                match[stk[top]] = i;
+                top--;
+            }
+        }
+
+        for(int i = 1; i <= n; i++) {
+            if(!match[i] || s[i] == '(') continue;
+            b[i] = b[match[i] - 1] + 1;
+        }
+
+        for(int i = n; i >= 1; i--) {
+            if(!match[i] || s[i] == ')') continue;
+            a[i] = a[match[i] + 1] + 1;
+        }
+        // for(int i = 1; i <= n; i++) {
+        //     if(!match[i] || s[i] == ')') continue;
+        //     ans[i] = 1LL * a[i] * b[match[i]] % mod;
+        //     if(up[i]) add(ans[i], ans[up[i]]);
+        //     ans[match[i]] = ans[i];
+        // }
+
+        // LL ret = 0;
+        // for(int i = 1; i <= n; i++) {
+        //     ret += 1LL * ans[i] * i % mod;
+        // }
+
+        // printf("%lld\n", ret);
     }
-    check(l);
-    printf("%.9Lf\n", dp[n] + 1.0 * l * tot);
     return 0;
 }
