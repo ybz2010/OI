@@ -1,30 +1,30 @@
-#include <bits/stdc++.h>
+#include<bits/extc++.h>
 #define int long long
-
 using namespace std;
-const int MAXN = 3e3 + 10, mod = 1e9 + 7;
-int n, m, k, mp[MAXN][MAXN], dp[MAXN], g[MAXN], _dp[MAXN], _g[MAXN];
-
-inline int sum_dp(int l, int r)
+const int maxn = 3005;
+const int mod = 1e9 + 7;
+int n,m,k;
+int mp[maxn][maxn];
+int g[maxn],dp[maxn];
+int _g[maxn],_dp[maxn];
+int sum_dp(int l,int r)
 {
-    l = max(l, 1LL), r = min(r, m);
-    return (_dp[r] - _dp[l - 1] + mod) % mod;
+    l = max(1ll,l);
+    r = min(m,r);
+    return _dp[r] - _dp[l - 1];
 }
-
-inline int sum_g(int l, int r)
+int sum_g(int l,int r)
 {
-    l = max(l, 1LL), r = min(r, m);
-    return (_g[r] - _g[l - 1] + mod) % mod;
+    l = max(1ll,l);
+    r = min(m,r);
+    return _g[r] - _g[l - 1];
 }
-
 signed main()
 {
-    scanf("%lld %lld %lld", &n, &m, &k);
+    scanf("%lld%lld%lld",&n,&m,&k);
     for (int i = 1; i <= n; i++)
-    {
         for (int j = 1; j <= m; j++)
-            scanf("%1lld", &mp[i][j]);
-    }
+            scanf("%1lld",&mp[i][j]);
     _dp[1] = 1;
     for (int i = 2; i <= m; i++)
     {
@@ -52,6 +52,6 @@ signed main()
             _g[j] = (_g[j - 1] + g[j]) % mod;
         }
     }
-    printf("%lld\n", (_dp[m] - _g[m] + mod) % mod);
+    printf("%lld",((_dp[m] - _g[m]) % mod + mod) % mod);
     return 0;
 }
