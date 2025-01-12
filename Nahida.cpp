@@ -1,123 +1,106 @@
 #include <bits/stdc++.h>
-#define LL long long
-#define LD long double
-#define ull unsigned long long
-#define fi first
-#define se second
-#define mk make_pair
-#define PLL pair<LL, LL>
-#define PLI pair<LL, int>
-#define PII pair<int, int>
-#define SZ(x) ((int)x.size())
-#define ALL(x) (x).begin(), (x).end()
-#define fio                      \
-    ios::sync_with_stdio(false); \
-    cin.tie(0);
-
 using namespace std;
-
-const int N = 1e6 + 7;
-const int inf = 0x3f3f3f3f;
-const LL INF = 0x3f3f3f3f3f3f3f3f;
+const int maxn = 5e5 + 20;
+const int maxm = 1e6 + 41;
 const int mod = 1e9 + 7;
-const double eps = 1e-8;
-const double PI = acos(-1);
 
-template <class T, class S>
-inline void add(T &a, S b)
-{
-    a += b;
-    if (a >= mod)
-        a -= mod;
-}
-template <class T, class S>
-inline void sub(T &a, S b)
-{
-    a -= b;
-    if (a < 0)
-        a += mod;
-}
-template <class T, class S>
-inline bool chkmax(T &a, S b) { return a < b ? a = b, true : false; }
-template <class T, class S>
-inline bool chkmin(T &a, S b) { return a > b ? a = b, true : false; }
-
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
+int T;
+int d;
+std::string a;
 int n;
-int stk[N], top;
-int p[N], a[N], b[N], up[N];
-int ans[N];
-char s[N];
+int cnt = 20;
 
-void init()
+long long sum = 1;                      // dp[i][1] 的前缀和
+long long b1[maxm], b0[maxm]; // dp[i][0] + dp[i][1] 的桶前缀和
+long long dp[maxn][2];
+int p, lft;
+int hsh[maxn];
+int maxv = 0;
+
+inline std::string read()
 {
-    for (int i = 1; i <= n + 5; i++)
+    std::string str = "";
+    char ch = getchar();
+    // 处理空格、换行或回车
+    while (ch == ' ' || ch == '\n' || ch == '\r')
+        ch = getchar();
+    // 读入
+    while (ch != ' ' && ch != '\n' && ch != '\r')
     {
-        p[i] = 0;
-        a[i] = 0;
-        b[i] = 0;
-        up[i] = 0;
-        ans[i] = 0;
+        str += ch;
+        ch = getchar();
     }
+    return str;
 }
 
-int main()
+void __stdcall print(int x)
 {
-    // int T; scanf("%d", &T);
-    int T = 1;
-    while (T--)
+    if (x > 9)
+        print(x / 10);
+    putchar(x % 10 + '0');
+}
+/*初始化字符串 hash*/
+inline void init()
+{
+    maxv = 0;
+    p = d, lft = 1;
+    int cnt2 = 0, cnt5 = 0;
+    while (!(p & 1))
+        p >>= 1, lft <<= 1, ++cnt2;
+    while (!(p % 5))
+        p /= 5, lft *= 5, cnt5++;
+    cnt = cnt2 > cnt5 ? cnt2 : cnt5;
+    hsh[n + 1] = 0;
+    for (int i = n, p10 = 1; i >= 1; i--, p10 = p10 * 10 % p)
+        hsh[i] = (hsh[i + 1] + (a[i] - '0') * p10) % p, maxv = std::max(maxv, hsh[i]);
+}
+inline void solve()
+{
+    sum = 1;
+    dp[0][1] = 1, dp[0][0] = 0;
+    b0[hsh[1]] = b1[hsh[1]] = cnt == 0 ? 1 : 0;
+    for (int i = 1; i <= n; ++i)
     {
-        scanf("%s", s + 1);
-        n = strlen(s + 1);
-        init();
-
-        top = 0;
-        for (int i = 1; i <= n; i++)
+        dp[i][0] = sum;
+        bool fl = true;
+        for (int j = 0,tmp = 0,p10 = 1; j < min(i,cnt); j++,p10 = p10 * 10 % d)
         {
-            if (s[i] == '(')
+            tmp = (tmp + p10 * (a[i - j] - '0')) % d;
+            if (!tmp)
             {
-                up[i] = stk[top];
-                stk[++top] = i;
+                dp[i][0] = ((dp[i][0] - dp[i - j - 1][1]) % mod + mod) % mod;
+                dp[i][1] = (dp[i][1] + dp[i - j - 1][0] + dp[i - j - 1][1]) % mod;
             }
-            else if (top)
-            {
-                p[i] = stk[top];
-                p[stk[top]] = i;
-                top--;
-            }
+            fl = !(tmp % lft);
         }
 
-        for (int i = 1; i <= n; i++)
+        /*处理 20 位以外的部分*/ 
+        if (fl)
         {
-            if (!p[i] || s[i] == '(')
-                continue;
-            b[i] = b[p[i] - 1] + 1;
+            dp[i][0] = ((dp[i][0] - b0[hsh[i + 1]]) % mod + mod) % mod;
+            dp[i][1] = (dp[i][1] + b1[hsh[i + 1]]) % mod;
         }
-
-        for (int i = n; i >= 1; i--)
+        sum = (sum + dp[i][1]) % mod;
+        if (i >= cnt)
         {
-            if (!p[i] || s[i] == ')')
-                continue;
-            a[i] = a[p[i] + 1] + 1;
+            b0[hsh[i - cnt + 1]] = (b0[hsh[i - cnt + 1]] + dp[i - cnt][1]) % mod;
+            b1[hsh[i - cnt + 1]] = (b1[hsh[i - cnt + 1]] + dp[i - cnt][0] + dp[i - cnt][1]) % mod;
         }
-        for (int i = 1; i <= n; i++)
-        {
-            if (!p[i] || s[i] == ')')
-                continue;
-            ans[i] = 1LL * a[i] * b[p[i]] % mod;
-            if (up[i])
-                add(ans[i], ans[up[i]]);
-            ans[p[i]] = ans[i];
-        }
-
-        LL ret = 0;
-        for (int i = 1; i <= n; i++)
-        {
-            ret += 1LL * ans[i] * i % mod;
-        }
-
-        // printf("%lld\n", ret);
     }
+    print((dp[n][1] + dp[n][0]) % mod), putchar('\n');
+    for (int i = 1; i <= n; ++i)
+        hsh[i] = dp[i][0] = dp[i][1] = 0;
+    for (int i = 0; i <= maxv; ++i)
+        b0[i] = b1[i] = 0;
+}
+
+signed main()
+{
+    a = read();
+    scanf("%d", &d);
+    n = a.size();
+    a = ' ' + a;
+    init();
+    solve();
     return 0;
 }
