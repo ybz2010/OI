@@ -42,19 +42,19 @@ signed main()
     for (int i = n; i >= 1; i--)
         if (p[i] && s[i] == '(')
             a[i] = a[p[i] + 1] + 1;
-    // for (int i = 1; i <= n; i++)
-    // {
-    //     if (!p[i] || s[i] == '(')
-    //         continue;
-    //     ans[i] = a[i] * b[p[i]] % mod;
-    //     if (up[i])
-    //         ans[i] = (ans[i] + ans[up[i]]) % mod;
-    //     ans[p[i]] = ans[i];
-    // }
-    // int sum = 0;
-    // for (int i = 1; i <= n; i++)
-    //     sum += ans[i] * i % mod;
-    // cout << sum;
+    for (int i = 1; i <= n; i++)
+    {
+        if (!p[i] || s[i] == ')')
+            continue;
+        ans[i] = a[i] * b[p[i]] % mod;
+        if (up[i])
+            ans[i] = (ans[i] + ans[up[i]]) % mod;
+        ans[p[i]] = ans[i];
+    }
+    int sum = 0;
+    for (int i = 1; i <= n; i++)
+        sum += ans[i] * i % mod;
+    cout << sum;
     return 0;
 }
 // 1 1 1 1
