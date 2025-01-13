@@ -1,57 +1,31 @@
-#include <bits/stdc++.h>
-#define int long long
-
+#include<bits/stdc++.h>
 using namespace std;
-const int maxn = 3e3 + 10, mod = 1e9 + 7;
-int n, m, k, mp[maxn][maxn], dp[maxn], g[maxn], _dp[maxn], _g[maxn];
-
-inline int sum_dp(int l, int r)
-{
-    l = max(l, 1LL), r = min(r, m);
-    return (_dp[r] - _dp[l - 1] + mod) % mod;
-}
-
-inline int sum_g(int l, int r)
-{
-    l = max(l, 1LL), r = min(r, m);
-    return (_g[r] - _g[l - 1] + mod) % mod;
-}
-
-signed main()
-{
-    scanf("%lld %lld %lld", &n, &m, &k);
-    for (int i = 1; i <= n; i++)
-    {
-        for (int j = 1; j <= m; j++)
-            scanf("%1lld", &mp[i][j]);
-    }
-    _dp[1] = 1;
-    for (int i = 2; i <= m; i++)
-    {
-        _dp[i] = _dp[i - 1] + 1;
-        if (mp[1][i] == mp[1][i - 1])
-            _g[i] = _g[i - 1] + 1;
-        else
-            _g[i] = _g[i - 1];
-    }
-    for (int i = 2; i <= n; i++)
-    {
-        g[1] = 0;
-        dp[1] = ((sum_dp(1,1 + k) - sum_g(1,1 + k)) % mod + mod) % mod;
-        for (int j = 2; j <= m; j++)
-        {
-            if (mp[i][j] == mp[i][j - 1])
-                g[j] = ((sum_dp(j - k,j + k - 1) - sum_g(j - k + 1,j + k - 1)) % mod + mod) % mod;
-            else
-                g[j] = 0;
-            dp[j] = ((sum_dp(j - k,j + k) - sum_g(j - k + 1,j + k)) % mod + mod) % mod;
-        }
-        for (int j = 1; j <= m; j++)
-        {
-            _dp[j] = (_dp[j - 1] + dp[j]) % mod;
-            _g[j] = (_g[j - 1] + g[j]) % mod;
-        }
-    }
-    printf("%lld\n", (_dp[m] - _g[m] + mod) % mod);
-    return 0;
+const int N=1e5+3;
+#define db double
+db x[N],y[N],a[N],b[N],r[N],c[N],d[N];
+int u,s[N*4];
+#define f(i,t) (y[t]+x[t]*c[i])
+void upd(int k,int t,int l,int r){
+	if(l==r){if(f(l,t)>f(l,s[k]))s[k]=t;return;}
+	int m=l+r>>1;
+	if(f(m,t)>f(m,s[k]))swap(t,s[k]);
+	f(l,t)>f(l,s[k])?upd(k*2,t,l,m):upd(k*2+1,t,m+1,r);
+}//李超树插入
+db qry(int k,int l,int r){
+	if(l==r)return f(u,s[k]);
+	int m=l+r>>1;
+	return max(f(u,s[k]),u>m?qry(k*2+1,m+1,r):qry(k*2,l,m));
+}//李超树查询
+int main(){
+	int n,i;
+	db f,g;
+	scanf("%d%lf",&n,&f);
+	for(i=1;i<=n;++i)scanf("%lf%lf%lf",a+i,b+i,r+i),c[i]=a[i]/b[i],d[i]=c[i];
+	sort(c+1,c+n+1);//离散化
+	for(i=1;i<=n;++i){
+		u=lower_bound(c+1,c+n+1,d[i])-c,f=max(f,b[i]*qry(1,1,n));
+		g=a[i]*r[i]+b[i],x[i]=f*r[i]/g,y[i]=f/g,upd(1,i,1,n);
+	}
+	printf("%.3lf",f);
+	return 0;
 }
