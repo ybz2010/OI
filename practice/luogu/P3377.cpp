@@ -3,19 +3,19 @@ using namespace std;
 const int maxn = 1e5 + 5;
 int n,q;
 struct Nahida{int val,ls,rs,fa,dis;}s[maxn];
-int find(int x){return s[x].fa == x ? x : s[x].fa = find(s[x].fa);}
-int merge(int x,int y)
+int find(int rt){return s[rt].fa == rt ? rt : s[rt].fa = find(s[rt].fa);}
+int merge(int rt,int x)
 {
-    if (!x || !y)
-        return x | y;
-    if (s[x].val > s[y].val || (s[x].val == s[y].val && x > y))
-        swap(x,y);
-    s[x].rs = merge(s[x].rs,y);
-    if (s[s[x].ls].dis < s[s[x].rs].dis)
-        swap(s[x].ls,s[x].rs);
-    s[s[x].ls].fa = s[s[x].rs].fa = s[x].fa = x;
-    s[x].dis = s[s[x].rs].dis + 1;
-    return x;
+    if (!rt || !x)
+        return rt | x;
+    if (s[rt].val > s[x].val || (s[rt].val == s[x].val && rt > x))
+        swap(rt,x);
+    s[rt].rs = merge(s[rt].rs,x);
+    if (s[s[rt].ls].dis < s[s[rt].rs].dis)
+        swap(s[rt].ls,s[rt].rs);
+    s[s[rt].ls].fa = s[s[rt].rs].fa = s[rt].fa = rt;
+    s[rt].dis = s[s[rt].rs].dis + 1;
+    return rt;
 }
 signed main()
 {
